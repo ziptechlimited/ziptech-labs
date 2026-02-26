@@ -21,6 +21,11 @@ export const createCohort = async (req: Request, res: Response): Promise<void> =
             facilitator: req.user?._id
         });
 
+        // Update facilitator's cohort field
+        if (req.user) {
+            await User.findByIdAndUpdate(req.user._id, { cohort: cohort._id });
+        }
+
         res.status(201).json(cohort);
     } catch (error) {
         console.error(error);
@@ -126,6 +131,29 @@ export const getCohort = async (req: Request, res: Response): Promise<void> => {
              return;
         }
 
+        res.status(200).json(cohort);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Get current user's cohort
+// @route   GET /api/cohorts/my-cohort
+// @access  Private
+export const getMyCohort = async (req: Request, res: Response): Promise<void> => {
+    try {
+        if (!req.user?.cohort) {
+            res.status(404).json({ message: 'You are not in a cohort yet' });
+            return;
+        }
+        const cohort = await (Cohort as any).findById(req.user.cohort)
+            .populate('members', 'name email role')
+            .populate('facilitator', 'name email');
+        if (!cohort) {
+            res.status(404).json({ message: 'Cohort not found' });
+            return;
+        }
         res.status(200).json(cohort);
     } catch (error) {
         console.error(error);

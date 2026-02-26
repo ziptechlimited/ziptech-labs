@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCohort = exports.joinCohort = exports.getCohorts = exports.createCohort = void 0;
+exports.getMyCohort = exports.getCohort = exports.joinCohort = exports.getCohorts = exports.createCohort = void 0;
 const Cohort_1 = __importDefault(require("../models/Cohort"));
+const User_1 = __importDefault(require("../models/User"));
 // @desc    Create a new cohort
 // @route   POST /api/cohorts
 // @access  Private (Admin/Coach)
@@ -31,6 +32,10 @@ const createCohort = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             endDate,
             facilitator: (_a = req.user) === null || _a === void 0 ? void 0 : _a._id
         });
+        // Update facilitator's cohort field
+        if (req.user) {
+            yield User_1.default.findByIdAndUpdate(req.user._id, { cohort: cohort._id });
+        }
         res.status(201).json(cohort);
     }
     catch (error) {
@@ -134,3 +139,28 @@ const getCohort = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getCohort = getCohort;
+// @desc    Get current user's cohort
+// @route   GET /api/cohorts/my-cohort
+// @access  Private
+const getMyCohort = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        if (!((_a = req.user) === null || _a === void 0 ? void 0 : _a.cohort)) {
+            res.status(404).json({ message: 'You are not in a cohort yet' });
+            return;
+        }
+        const cohort = yield Cohort_1.default.findById(req.user.cohort)
+            .populate('members', 'name email role')
+            .populate('facilitator', 'name email');
+        if (!cohort) {
+            res.status(404).json({ message: 'Cohort not found' });
+            return;
+        }
+        res.status(200).json(cohort);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+exports.getMyCohort = getMyCohort;

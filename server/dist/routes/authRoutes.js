@@ -10,4 +10,6 @@ const router = express_1.default.Router();
 router.post('/register', authController_1.registerUser);
 router.post('/login', authController_1.loginUser);
 router.get('/me', authMiddleware_1.protect, authController_1.getMe);
+router.post('/send-verification', authMiddleware_1.protect, authController_1.sendVerificationLimiter, authController_1.sendVerification);
+router.get('/verify', authController_1.confirmVerification);
 exports.default = router;

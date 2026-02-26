@@ -1,39 +1,102 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import LandingPage from './pages/LandingPage';
+import FacilitatorDashboard from './pages/FacilitatorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import CohortDetails from './pages/CohortDetails';
+import NotFound from './pages/NotFound';
 
 interface PrivateRouteProps {
   children: JSX.Element;
+  allowedRoles?: string[];
 }
 
-const PrivateRoute = ({ children }: PrivateRouteProps) => {
+const PrivateRoute = ({ children, allowedRoles = [] }: PrivateRouteProps) => {
     const { user, loading } = useAuth();
     
     if (loading) {
-        return <div>Loading...</div>; // Simple loading state
+        return <div className="min-h-screen flex items-center justify-center">
+            <div className="text-gray-600">Loading...</div>
+        </div>;
     }
     
-    return user ? children : <Navigate to="/login" />;
+    if (!user) {
+        return <Navigate to="/login" />;
+    }
+    
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/dashboard" />;
+    }
+    
+    return children;
+};
+
+interface PublicRouteProps {
+  children: JSX.Element;
+}
+
+const PublicRoute = ({ children }: PublicRouteProps) => {
+    const { user } = useAuth();
+    return user ? <Navigate to="/dashboard" /> : children;
 };
 
 function App() {
+  const { user } = useAuth();
+
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      
+      {/* Public Routes */}
+      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      
+      {/* Protected Routes - All Users */}
       <Route 
         path="/dashboard" 
         element={
           <PrivateRoute>
-            <Dashboard />
+            {user?.role === 'facilitator' ? <FacilitatorDashboard /> : 
+             user?.role === 'admin' ? <AdminDashboard /> : 
+             <Dashboard />}
           </PrivateRoute>
         } 
       />
-      <Route path="*" element={<Navigate to="/" />} />
+      
+      <Route 
+        path="/cohort/:id" 
+        element={
+          <PrivateRoute>
+            <CohortDetails />
+          </PrivateRoute>
+        } 
+      />
+      
+      {/* Facilitator Routes */}
+      <Route 
+        path="/facilitator" 
+        element={
+          <PrivateRoute allowedRoles={['facilitator', 'admin']}>
+            <FacilitatorDashboard />
+          </PrivateRoute>
+        } 
+      />
+      
+      {/* Admin Routes */}
+      <Route 
+        path="/admin" 
+        element={
+          <PrivateRoute allowedRoles={['admin']}>
+            <AdminDashboard />
+          </PrivateRoute>
+        } 
+      />
+      
+      {/* 404 */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

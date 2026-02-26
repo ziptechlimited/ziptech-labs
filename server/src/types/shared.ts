@@ -12,6 +12,10 @@ export interface IUser {
   role: UserRole;
   cohort?: string | ICohort;
   goals?: string[] | IGoal[];
+  isVerified?: boolean;
+  verifiedAt?: Date;
+  verificationTokenHash?: string;
+  verificationTokenExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

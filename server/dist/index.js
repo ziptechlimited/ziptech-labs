@@ -13,6 +13,10 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const cohortRoutes_1 = __importDefault(require("./routes/cohortRoutes"));
 const goalRoutes_1 = __importDefault(require("./routes/goalRoutes"));
 const checkInRoutes_1 = __importDefault(require("./routes/checkInRoutes"));
+const supportRoutes_1 = __importDefault(require("./routes/supportRoutes"));
+const analyticsRoutes_1 = __importDefault(require("./routes/analyticsRoutes"));
+const meetingRoutes_1 = __importDefault(require("./routes/meetingRoutes"));
+const messageRoutes_1 = __importDefault(require("./routes/messageRoutes"));
 const app = (0, express_1.default)();
 // Middleware
 app.use(express_1.default.json());
@@ -28,6 +32,10 @@ app.use('/api/auth', authRoutes_1.default);
 app.use('/api/cohorts', cohortRoutes_1.default);
 app.use('/api/goals', goalRoutes_1.default);
 app.use('/api/checkins', checkInRoutes_1.default);
+app.use('/api/support', supportRoutes_1.default);
+app.use('/api/analytics', analyticsRoutes_1.default);
+app.use('/api/meetings', meetingRoutes_1.default);
+app.use('/api/messages', messageRoutes_1.default);
 app.get('/', (req, res) => {
     res.send('Ziptech Labs API Running');
 });

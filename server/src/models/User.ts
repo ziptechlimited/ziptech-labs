@@ -29,6 +29,19 @@ const UserSchema: Schema<IUserDocument> = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.FOUNDER
   },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  verifiedAt: {
+    type: Date
+  },
+  verificationTokenHash: {
+    type: String
+  },
+  verificationTokenExpires: {
+    type: Date
+  },
   cohort: {
     type: Schema.Types.ObjectId,
     ref: 'Cohort'
@@ -60,4 +73,3 @@ UserSchema.methods.matchPassword = async function(enteredPassword: string): Prom
 
 const User = mongoose.model<IUserDocument>('User', UserSchema);
 export default User;
-

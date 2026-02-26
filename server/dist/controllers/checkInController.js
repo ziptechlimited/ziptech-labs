@@ -20,33 +20,38 @@ const Goal_1 = __importDefault(require("../models/Goal"));
 // @access  Private
 const createCheckIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { goalId, status, blockerNote } = req.body;
+    const { goalId, goal, status, blockerNote, blocker } = req.body;
     try {
-        const goal = yield Goal_1.default.findById(goalId);
-        if (!goal) {
+        const targetGoalId = goalId || goal;
+        if (!targetGoalId) {
+            res.status(400).json({ message: 'Missing goalId' });
+            return;
+        }
+        const goalDoc = yield Goal_1.default.findById(targetGoalId);
+        if (!goalDoc) {
             res.status(404).json({ message: 'Goal not found' });
             return;
         }
-        if (goal.user.toString() !== ((_a = req.user) === null || _a === void 0 ? void 0 : _a._id.toString())) {
+        if (goalDoc.user.toString() !== ((_a = req.user) === null || _a === void 0 ? void 0 : _a._id.toString())) {
             res.status(401).json({ message: 'User not authorized' });
             return;
         }
         // Check if already checked in
-        const existingCheckIn = yield CheckIn_1.default.findOne({ goal: goalId });
+        const existingCheckIn = yield CheckIn_1.default.findOne({ goal: targetGoalId });
         if (existingCheckIn) {
             res.status(400).json({ message: 'Already checked in for this goal' });
             return;
         }
         const checkIn = yield CheckIn_1.default.create({
             user: req.user._id,
-            goal: goalId,
-            weekNumber: goal.weekNumber,
+            goal: targetGoalId,
+            weekNumber: goalDoc.weekNumber,
             status,
-            blockerNote
+            blockerNote: blockerNote || blocker
         });
         // Update goal status as well to match check-in
-        goal.status = status;
-        yield goal.save();
+        goalDoc.status = status;
+        yield goalDoc.save();
         res.status(201).json(checkIn);
     }
     catch (error) {

@@ -9,6 +9,10 @@ import authRoutes from './routes/authRoutes';
 import cohortRoutes from './routes/cohortRoutes';
 import goalRoutes from './routes/goalRoutes';
 import checkInRoutes from './routes/checkInRoutes';
+import supportRoutes from './routes/supportRoutes';
+import analyticsRoutes from './routes/analyticsRoutes';
+import meetingRoutes from './routes/meetingRoutes';
+import messageRoutes from './routes/messageRoutes';
 
 const app: Express = express();
 
@@ -28,6 +32,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cohorts', cohortRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/checkins', checkInRoutes);
+app.use('/api/support', supportRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/meetings', meetingRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Ziptech Labs API Running');
@@ -37,4 +45,3 @@ app.get('/', (req: Request, res: Response) => {
 app.listen(config.PORT, () => {
     console.log(`Server running on port ${config.PORT}`);
 });
-

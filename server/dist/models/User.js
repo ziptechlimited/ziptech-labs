@@ -70,6 +70,19 @@ const UserSchema = new mongoose_1.Schema({
         enum: Object.values(shared_1.UserRole),
         default: shared_1.UserRole.FOUNDER
     },
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    verifiedAt: {
+        type: Date
+    },
+    verificationTokenHash: {
+        type: String
+    },
+    verificationTokenExpires: {
+        type: Date
+    },
     cohort: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: 'Cohort'

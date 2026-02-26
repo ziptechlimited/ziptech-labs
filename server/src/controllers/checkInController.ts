@@ -6,23 +6,34 @@ import Goal from '../models/Goal';
 // @route   POST /api/checkins
 // @access  Private
 export const createCheckIn = async (req: Request, res: Response): Promise<void> => {
-    const { goalId, status, blockerNote } = req.body;
+    const { goalId, goal, status, blockerNote, blocker } = req.body as {
+        goalId?: string;
+        goal?: string;
+        status: 'done' | 'partial' | 'not_done';
+        blockerNote?: string;
+        blocker?: string;
+    };
 
     try {
-        const goal = await Goal.findById(goalId);
+        const targetGoalId = goalId || goal;
+        if (!targetGoalId) {
+            res.status(400).json({ message: 'Missing goalId' });
+            return;
+        }
+        const goalDoc = await Goal.findById(targetGoalId);
 
-        if (!goal) {
+        if (!goalDoc) {
             res.status(404).json({ message: 'Goal not found' });
             return;
         }
 
-        if (goal.user.toString() !== req.user?._id.toString()) {
+        if (goalDoc.user.toString() !== req.user?._id.toString()) {
             res.status(401).json({ message: 'User not authorized' });
             return;
         }
 
         // Check if already checked in
-        const existingCheckIn = await CheckIn.findOne({ goal: goalId });
+        const existingCheckIn = await CheckIn.findOne({ goal: targetGoalId });
         if (existingCheckIn) {
             res.status(400).json({ message: 'Already checked in for this goal' });
             return;
@@ -30,15 +41,15 @@ export const createCheckIn = async (req: Request, res: Response): Promise<void> 
 
         const checkIn = await CheckIn.create({
             user: req.user._id,
-            goal: goalId,
-            weekNumber: goal.weekNumber,
+            goal: targetGoalId,
+            weekNumber: goalDoc.weekNumber,
             status,
-            blockerNote
+            blockerNote: blockerNote || blocker
         });
 
         // Update goal status as well to match check-in
-        goal.status = status;
-        await goal.save();
+        goalDoc.status = status;
+        await goalDoc.save();
 
         res.status(201).json(checkIn);
     } catch (error) {
