@@ -10,7 +10,19 @@ interface GoalFormProps {
 const GoalForm: React.FC<GoalFormProps> = ({ onSuccess }) => {
     const [description, setDescription] = useState('');
     const [type, setType] = useState<'public' | 'private'>('public');
+    const [subTaskText, setSubTaskText] = useState('');
+    const [subTasks, setSubTasks] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
+
+    const addSubTask = () => {
+        const t = subTaskText.trim();
+        if (!t) return;
+        setSubTasks([...subTasks, t]);
+        setSubTaskText('');
+    };
+    const removeSubTask = (idx: number) => {
+        setSubTasks(subTasks.filter((_, i) => i !== idx));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,10 +32,11 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSuccess }) => {
             await axios.post(`${API_CONFIG.BASE_URL}/goals`, {
                 description,
                 type,
-                subTasks: [] // Optional for now
+                subTasks: subTasks.map(t => ({ description: t, completed: false }))
             });
             toast.success('Goal created successfully');
             setDescription('');
+            setSubTasks([]);
             if (onSuccess) onSuccess();
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to create goal');
@@ -77,6 +90,42 @@ const GoalForm: React.FC<GoalFormProps> = ({ onSuccess }) => {
                             <span className="ml-2 text-sm text-gray-700">Private</span>
                         </label>
                     </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Subtasks</label>
+                    <div className="flex space-x-2">
+                        <input
+                            type="text"
+                            value={subTaskText}
+                            onChange={(e) => setSubTaskText(e.target.value)}
+                            className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Add a subtask and press Add"
+                        />
+                        <button
+                            type="button"
+                            onClick={addSubTask}
+                            className="px-3 py-2 bg-gray-800 text-white rounded-md"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    {subTasks.length > 0 && (
+                        <ul className="mt-2 space-y-1">
+                            {subTasks.map((t, idx) => (
+                                <li key={idx} className="flex items-center justify-between text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded px-2 py-1">
+                                    <span>{t}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeSubTask(idx)}
+                                        className="text-red-600 hover:text-red-800"
+                                    >
+                                        Remove
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
 
                 <div className="pt-2">

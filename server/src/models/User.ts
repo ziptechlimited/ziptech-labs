@@ -29,6 +29,11 @@ const UserSchema: Schema<IUserDocument> = new Schema({
     enum: Object.values(UserRole),
     default: UserRole.FOUNDER
   },
+  bio: { type: String, maxlength: 400 },
+  avatarUrl: { type: String },
+  company: { type: String, maxlength: 120 },
+  website: { type: String, maxlength: 200 },
+  location: { type: String, maxlength: 120 },
   isVerified: {
     type: Boolean,
     default: false

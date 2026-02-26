@@ -70,6 +70,11 @@ const UserSchema = new mongoose_1.Schema({
         enum: Object.values(shared_1.UserRole),
         default: shared_1.UserRole.FOUNDER
     },
+    bio: { type: String, maxlength: 400 },
+    avatarUrl: { type: String },
+    company: { type: String, maxlength: 120 },
+    website: { type: String, maxlength: 200 },
+    location: { type: String, maxlength: 120 },
     isVerified: {
         type: Boolean,
         default: false

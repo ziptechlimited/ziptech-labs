@@ -10,14 +10,19 @@ import CheckInModal from "../components/CheckInModal";
 import SupportActions from "../components/SupportActions";
 import MeetingsList from "../components/MeetingsList";
 import VerificationBanner from "../components/VerificationBanner";
+import ChatPanel from "../components/ChatPanel";
 
+interface SubTask {
+  description: string;
+  completed: boolean;
+}
 interface Goal {
   _id: string;
   description: string;
   visibility: "public" | "private";
   status: string;
   user: { _id: string; name: string };
-  subTasks?: string[];
+  subTasks?: SubTask[];
 }
 
 interface Cohort {
@@ -32,6 +37,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [cohort, setCohort] = useState<Cohort | null>(null);
+  const [myPrivateGoal, setMyPrivateGoal] = useState<Goal | null>(null);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isGoalFormOpen, setIsGoalFormOpen] = useState(false);
   const [checkInModal, setCheckInModal] = useState<{
@@ -61,14 +67,17 @@ const Dashboard = () => {
       if (Array.isArray(res.data)) {
         // User not in cohort, empty array
         setGoals([]);
+        setMyPrivateGoal(null);
       } else {
         // Combine public goals with user's own goals for display
         const allGoals = [...(res.data.publicGoals || [])];
         setGoals(allGoals);
+        setMyPrivateGoal(res.data.myPrivateGoal || null);
       }
     } catch (error) {
       console.error("Error fetching goals:", error);
       setGoals([]); // Set empty array on error
+      setMyPrivateGoal(null);
     }
   };
 
@@ -179,6 +188,82 @@ const Dashboard = () => {
               <div className="p-6">
                 {activeTab === "goals" && (
                   <div className="space-y-6">
+                    {/* My Private Goal */}
+                    {myPrivateGoal && (
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                          My Private Goal
+                        </h3>
+                        <div className="flex justify-between items-start mb-2">
+                          <p className="text-gray-900">
+                            {myPrivateGoal.description}
+                          </p>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              myPrivateGoal.status === "done"
+                                ? "bg-green-100 text-green-800"
+                                : myPrivateGoal.status === "partial"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {myPrivateGoal.status || "pending"}
+                          </span>
+                        </div>
+                        {myPrivateGoal.subTasks &&
+                          myPrivateGoal.subTasks.length > 0 && (
+                            <div className="mt-3">
+                              <p className="text-sm font-medium text-gray-700 mb-2">
+                                Subtasks
+                              </p>
+                              <ul className="space-y-2">
+                                {myPrivateGoal.subTasks.map((st, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded px-3 py-2"
+                                  >
+                                    <label className="flex items-center space-x-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={st.completed}
+                                        onChange={async () => {
+                                          if (!user?.isVerified) return;
+                                          const updated = [
+                                            ...(myPrivateGoal.subTasks || []),
+                                          ];
+                                          updated[idx] = {
+                                            ...st,
+                                            completed: !st.completed,
+                                          };
+                                          try {
+                                            await axios.patch(
+                                              `${API_CONFIG.BASE_URL}/goals/${myPrivateGoal._id}`,
+                                              { subTasks: updated },
+                                            );
+                                            setMyPrivateGoal({
+                                              ...myPrivateGoal,
+                                              subTasks: updated,
+                                            });
+                                          } catch (e) {
+                                            console.error(e);
+                                          }
+                                        }}
+                                        disabled={!user?.isVerified}
+                                      />
+                                      <span
+                                        className={`${st.completed ? "line-through text-gray-500" : "text-gray-800"}`}
+                                      >
+                                        {st.description}
+                                      </span>
+                                    </label>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                      </div>
+                    )}
+
                     {/* My Goals */}
                     <div>
                       <div className="flex justify-between items-center mb-4">
@@ -228,14 +313,30 @@ const Dashboard = () => {
                                     {goal.visibility}
                                   </span>
                                 </div>
-                                <button
-                                  onClick={() =>
-                                    openCheckIn(goal._id, goal.description)
-                                  }
-                                  className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition"
-                                >
-                                  Check-in
-                                </button>
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() =>
+                                      openCheckIn(goal._id, goal.description)
+                                    }
+                                    className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition"
+                                  >
+                                    Check-in
+                                  </button>
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await axios.patch(
+                                          `${API_CONFIG.BASE_URL}/goals/${goal._id}`,
+                                          { status: "done" },
+                                        );
+                                        fetchGoals();
+                                      } catch (e) {}
+                                    }}
+                                    className="px-3 py-1 bg-gray-800 text-white text-sm rounded"
+                                  >
+                                    Mark Done
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -262,9 +363,12 @@ const Dashboard = () => {
                               >
                                 <div className="flex justify-between items-start mb-2">
                                   <div>
-                                    <p className="font-semibold text-primary">
+                                    <a
+                                      href={`/profile/${goal.user._id}`}
+                                      className="font-semibold text-primary hover:underline"
+                                    >
                                       {goal.user.name}
-                                    </p>
+                                    </a>
                                     <p className="text-gray-700 mt-1">
                                       {goal.description}
                                     </p>
@@ -312,9 +416,7 @@ const Dashboard = () => {
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
                       Cohort Chat
                     </h3>
-                    <p className="text-gray-500 italic">
-                      Chat feature coming soon...
-                    </p>
+                    <ChatPanel cohortId={cohort._id} />
                   </div>
                 )}
               </div>
@@ -339,7 +441,13 @@ const Dashboard = () => {
                   <div className="space-y-2">
                     {cohort.members.slice(0, 5).map((member) => (
                       <div key={member._id} className="text-sm text-gray-700">
-                        • {member.name}
+                        •{" "}
+                        <a
+                          href={`/profile/${member._id}`}
+                          className="hover:underline text-primary"
+                        >
+                          {member.name}
+                        </a>
                       </div>
                     ))}
                     {cohort.members.length > 5 && (

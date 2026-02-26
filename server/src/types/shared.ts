@@ -1,7 +1,7 @@
 export enum UserRole {
-  FOUNDER = 'founder',
-  FACILITATOR = 'facilitator',
-  ADMIN = 'admin'
+  FOUNDER = "founder",
+  FACILITATOR = "facilitator",
+  ADMIN = "admin",
 }
 
 export interface IUser {
@@ -10,6 +10,11 @@ export interface IUser {
   email: string;
   password?: string;
   role: UserRole;
+  bio?: string;
+  avatarUrl?: string;
+  company?: string;
+  website?: string;
+  location?: string;
   cohort?: string | ICohort;
   goals?: string[] | IGoal[];
   isVerified?: boolean;
@@ -36,9 +41,9 @@ export interface IGoal {
   _id: string;
   user: string | IUser;
   cohort: string | ICohort;
-  type: 'public' | 'private';
+  type: "public" | "private";
   description: string;
-  status: 'pending' | 'done' | 'partial' | 'not_done';
+  status: "pending" | "done" | "partial" | "not_done";
   weekNumber: number;
   subTasks: { description: string; completed: boolean }[];
   createdAt: Date;
@@ -51,7 +56,7 @@ export interface ICheckIn {
   goal: string | IGoal;
   weekNumber: number;
   date: Date;
-  status: 'done' | 'partial' | 'not_done';
+  status: "done" | "partial" | "not_done";
   blockerNote?: string;
   report?: string; // Was this in schema?
   // Schema had blockerNote.
