@@ -15,11 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCheckIns = exports.createCheckIn = void 0;
 const CheckIn_1 = __importDefault(require("../models/CheckIn"));
 const Goal_1 = __importDefault(require("../models/Goal"));
+const CheckInSession_1 = __importDefault(require("../models/CheckInSession"));
 // @desc    Submit a check-in for a goal
 // @route   POST /api/checkins
 // @access  Private
 const createCheckIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const { goalId, goal, status, blockerNote, blocker } = req.body;
     try {
         const targetGoalId = goalId || goal;
@@ -52,6 +53,25 @@ const createCheckIn = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         // Update goal status as well to match check-in
         goalDoc.status = status;
         yield goalDoc.save();
+        const cohortId = (_b = goalDoc.cohort) === null || _b === void 0 ? void 0 : _b.toString();
+        if (cohortId && req.user) {
+            const existingSession = yield CheckInSession_1.default.findOne({ cohort: cohortId, active: true });
+            if (!existingSession) {
+                const session = yield CheckInSession_1.default.create({
+                    cohort: cohortId,
+                    active: true,
+                    startedBy: req.user._id
+                });
+                const io = req.app.get('io');
+                if (io) {
+                    io.to(`cohort:${cohortId}`).emit('session', { active: true });
+                }
+                console.log('Check-in session started from check-in', {
+                    cohortId,
+                    sessionId: session._id.toString()
+                });
+            }
+        }
         res.status(201).json(checkIn);
     }
     catch (error) {

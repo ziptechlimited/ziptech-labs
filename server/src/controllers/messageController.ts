@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Message from '../models/Message';
 import Cohort from '../models/Cohort';
+import CheckInSession from '../models/CheckInSession';
 
 const isCheckInDay = (): boolean => {
   const today = new Date().getDay();
@@ -16,8 +17,9 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
     const { content } = req.body as { content: string };
     const cohortId = req.params.id;
 
-    if (!isCheckInDay()) {
-      res.status(403).json({ message: 'Chat is only available on check-in days' });
+    const sessionActive = await CheckInSession.findOne({ cohort: cohortId, active: true });
+    if (!isCheckInDay() && !sessionActive) {
+      res.status(403).json({ message: 'Chat is only available on check-in days or during an active session' });
       return;
     }
 
@@ -50,6 +52,10 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       expiresAt,
     });
     await message.populate('user', 'name');
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`cohort:${cohortId}`).emit('message', { message });
+    }
     res.status(201).json(message);
   } catch (error) {
     console.error(error);
@@ -83,7 +89,8 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
     const messages = await Message.find({ cohort: cohortId, isMuted: false })
       .populate('user', 'name')
       .sort({ createdAt: 1 });
-    res.status(200).json({ messages, isCheckInDay: isCheckInDay() });
+    const sessionActive = await CheckInSession.findOne({ cohort: cohortId, active: true });
+    res.status(200).json({ messages, isCheckInDay: isCheckInDay(), sessionActive: !!sessionActive });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
@@ -137,4 +144,3 @@ export const muteMessage = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: 'Server error' });
   }
 };
-

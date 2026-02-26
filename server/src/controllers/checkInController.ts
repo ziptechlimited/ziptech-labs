@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import CheckIn from '../models/CheckIn';
 import Goal from '../models/Goal';
+import CheckInSession from '../models/CheckInSession';
 
 // @desc    Submit a check-in for a goal
 // @route   POST /api/checkins
@@ -50,6 +51,26 @@ export const createCheckIn = async (req: Request, res: Response): Promise<void> 
         // Update goal status as well to match check-in
         goalDoc.status = status;
         await goalDoc.save();
+
+        const cohortId = (goalDoc.cohort as any)?.toString();
+        if (cohortId && req.user) {
+            const existingSession = await CheckInSession.findOne({ cohort: cohortId, active: true });
+            if (!existingSession) {
+                const session = await CheckInSession.create({
+                    cohort: cohortId,
+                    active: true,
+                    startedBy: req.user._id
+                });
+                const io = req.app.get('io');
+                if (io) {
+                    io.to(`cohort:${cohortId}`).emit('session', { active: true });
+                }
+                console.log('Check-in session started from check-in', {
+                    cohortId,
+                    sessionId: session._id.toString()
+                });
+            }
+        }
 
         res.status(201).json(checkIn);
     } catch (error) {

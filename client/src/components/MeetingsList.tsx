@@ -9,6 +9,7 @@ interface Meeting {
     agenda: string;
     scheduledAt: string;
     duration: number;
+    meetLink?: string;
     rsvps: Array<{
         user: { _id: string; name: string };
         status: 'yes' | 'maybe' | 'no';
@@ -107,6 +108,34 @@ const MeetingsList = ({ cohortId }: MeetingsListProps) => {
                             </button>
                         </div>
                     </div>
+                    {meeting.rsvps.length > 0 && (
+                        <div className="mt-3 text-xs text-gray-600">
+                            Attendees:{" "}
+                            {meeting.rsvps
+                                .filter(r => r.status === 'yes')
+                                .map(r => (
+                                    <a
+                                        key={r.user._id}
+                                        href={`/profile/${r.user._id}`}
+                                        className="hover:underline text-primary mr-2"
+                                    >
+                                        {r.user.name}
+                                    </a>
+                                ))}
+                        </div>
+                    )}
+                    {meeting.meetLink && (
+                        <div className="mt-3 text-xs">
+                            <a
+                                href={meeting.meetLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-blue-600 hover:underline mr-2"
+                            >
+                                Join via Google Meet
+                            </a>
+                        </div>
+                    )}
                 </div>
             ))}
         </div>

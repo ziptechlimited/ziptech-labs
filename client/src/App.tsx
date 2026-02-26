@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CohortDetails from "./pages/CohortDetails";
 import NotFound from "./pages/NotFound";
 import UserProfile from "./pages/UserProfile";
+import PublicProfile from "./pages/PublicProfile";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -62,6 +63,7 @@ function App() {
           </PublicRoute>
         }
       />
+      <Route path="/u/:slug" element={<PublicProfile />} />
       <Route
         path="/register"
         element={

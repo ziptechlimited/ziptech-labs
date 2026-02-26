@@ -15,6 +15,7 @@ export interface IUser {
   company?: string;
   website?: string;
   location?: string;
+  slug?: string;
   cohort?: string | ICohort;
   goals?: string[] | IGoal[];
   isVerified?: boolean;

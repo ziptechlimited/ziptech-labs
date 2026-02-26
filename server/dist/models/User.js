@@ -48,61 +48,63 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const shared_1 = require("../types/shared");
+const slugify_1 = __importDefault(require("slugify"));
 const UserSchema = new mongoose_1.Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
     email: {
         type: String,
         required: true,
         unique: true,
         trim: true,
-        lowercase: true
+        lowercase: true,
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     role: {
         type: String,
         enum: Object.values(shared_1.UserRole),
-        default: shared_1.UserRole.FOUNDER
+        default: shared_1.UserRole.FOUNDER,
     },
     bio: { type: String, maxlength: 400 },
     avatarUrl: { type: String },
     company: { type: String, maxlength: 120 },
     website: { type: String, maxlength: 200 },
     location: { type: String, maxlength: 120 },
+    slug: { type: String, unique: true, sparse: true },
     isVerified: {
         type: Boolean,
-        default: false
+        default: false,
     },
     verifiedAt: {
-        type: Date
+        type: Date,
     },
     verificationTokenHash: {
-        type: String
+        type: String,
     },
     verificationTokenExpires: {
-        type: Date
+        type: Date,
     },
     cohort: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Cohort'
+        ref: "Cohort",
     },
     createdAt: {
         type: Date,
-        default: Date.now
-    }
+        default: Date.now,
+    },
 }, {
-    timestamps: true // This adds createdAt and updatedAt automatically
+    timestamps: true, // This adds createdAt and updatedAt automatically
 });
 // Password Hash Middleware
-UserSchema.pre('save', function (next) {
+UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!this.isModified('password')) {
+        if (!this.isModified("password")) {
             return next();
         }
         const salt = yield bcryptjs_1.default.genSalt(10);
@@ -118,5 +120,15 @@ UserSchema.methods.matchPassword = function (enteredPassword) {
         return yield bcryptjs_1.default.compare(enteredPassword, this.password);
     });
 };
-const User = mongoose_1.default.model('User', UserSchema);
+const User = mongoose_1.default.model("User", UserSchema);
 exports.default = User;
+// Ensure slug is set
+UserSchema.pre("save", function (next) {
+    if (!this.isModified("name") && this.slug)
+        return next();
+    const base = this.name || "";
+    const s = (0, slugify_1.default)(base, { lower: true, strict: true });
+    if (s)
+        this.slug = s;
+    next();
+});

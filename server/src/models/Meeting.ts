@@ -11,6 +11,8 @@ export interface IMeeting extends Document {
   agenda?: string;
   scheduledAt: Date;
   duration: number;
+  meetLink?: string;
+  calendarEventId?: string;
   rsvps: IMeetingRSVP[];
   attendance: mongoose.Types.ObjectId[];
   createdBy: mongoose.Types.ObjectId;
@@ -39,6 +41,12 @@ const MeetingSchema: Schema<IMeeting> = new Schema(
     duration: {
       type: Number,
       default: 60,
+    },
+    meetLink: {
+      type: String,
+    },
+    calendarEventId: {
+      type: String,
     },
     rsvps: [
       {
