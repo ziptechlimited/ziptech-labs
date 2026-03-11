@@ -5,41 +5,65 @@ import { ArrowRight, CheckCircle, Users, Target, Activity } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
-        <div className="text-2xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-          <span className="text-blue-600">Ziptech</span> Labs
-        </div>
-        <div className="space-x-4">
-          <Link to="/login" className="text-slate-600 hover:text-slate-900 font-medium">Log In</Link>
-          <Link to="/register" className="bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-slate-800 transition-colors">
-            Get Started
+    <div className="min-h-screen bg-background text-text">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-background/70 backdrop-blur">
+        <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
+          <Link to="/" className="flex items-baseline gap-3">
+            <span className="text-xs uppercase tracking-[0.35em] text-muted">
+              Ziptech
+            </span>
+            <span className="text-lg font-semibold tracking-[-0.02em] text-primary">
+              Labs
+            </span>
           </Link>
-        </div>
-      </nav>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/login"
+              className="text-sm font-medium text-muted hover:text-primary transition"
+            >
+              Log in
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-full border border-white/10 bg-surface px-5 py-2.5 text-sm font-semibold text-primary hover:border-white/20 hover:bg-white/5 transition"
+            >
+              Get started
+            </Link>
+          </div>
+        </nav>
+      </header>
 
       {/* Hero Section */}
-      <header className="max-w-7xl mx-auto px-6 py-20 md:py-32 grid md:grid-cols-2 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-6 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight mb-6">
-            Build Faster. <br/>
-            <span className="text-blue-600">Ship Together.</span>
+          <div className="mb-5 text-xs uppercase tracking-[0.35em] text-muted">
+            Accountability infrastructure
+          </div>
+          <h1 className="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-[0.92] text-primary mb-6">
+            Perfect momentum
+            <br />
+            for builders.
           </h1>
-          <p className="text-xl text-slate-600 mb-8 leading-relaxed">
-            The ultimate accountability platform for builders and founders. 
-            Join a cohort, set weekly goals, and verify your progress with peers.
+          <p className="text-lg md:text-xl text-muted mb-8 leading-relaxed max-w-xl">
+            Join a cohort, set weekly goals, and verify progress with peers. Stay
+            focused on shipping—week after week.
           </p>
           <div className="flex gap-4">
-            <Link to="/register" className="flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/25">
-              Join a Cohort <ArrowRight className="w-5 h-5" />
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm md:text-base font-semibold text-black hover:brightness-95 transition"
+            >
+              Join a cohort <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="#how-it-works" className="flex items-center gap-2 bg-white text-slate-700 border border-slate-200 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-50 transition-all">
-              Learn More
+            <a
+              href="#how-it-works"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-sm md:text-base font-semibold text-primary hover:bg-white/10 transition"
+            >
+              Learn more
             </a>
           </div>
         </motion.div>
@@ -51,61 +75,69 @@ const LandingPage: React.FC = () => {
           className="relative hidden md:block"
         >
            {/* Abstract illustration placeholder using pure CSS/SVG/Divs if needed or just a clean card UI mock */}
-           <div className="bg-white p-8 rounded-2xl shadow-2xl border border-slate-100 rotate-3 hover:rotate-0 transition-transform duration-500">
-              <div className="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
-                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+           <div className="relative rounded-3xl border border-white/10 bg-surface p-8 shadow-2xl shadow-black/40 rotate-2 hover:rotate-0 transition-transform duration-500">
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+              <div className="relative flex items-center gap-4 mb-6 border-b border-white/10 pb-4">
+                 <div className="w-12 h-12 bg-accent/15 rounded-full flex items-center justify-center text-accent">
                     <Target className="w-6 h-6" />
                  </div>
                  <div>
-                    <h3 className="font-bold text-lg text-slate-900">Weekly Goal</h3>
-                    <p className="text-slate-500 text-sm">Ship MVP Landing Page</p>
+                    <h3 className="font-semibold text-lg text-primary">Weekly Goal</h3>
+                    <p className="text-muted text-sm">Ship MVP landing page</p>
                  </div>
-                 <div className="ml-auto px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                 <div className="ml-auto px-3 py-1 bg-white/10 text-muted text-xs font-semibold rounded-full">
                     IN PROGRESS
                  </div>
               </div>
               
-              <div className="space-y-4">
+              <div className="relative space-y-4">
                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-slate-300" />
-                    <span className="text-slate-500 line-through">Design Hero Section</span>
+                    <CheckCircle className="w-5 h-5 text-white/25" />
+                    <span className="text-muted line-through">Design hero section</span>
                  </div>
                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-500" />
-                    <span className="text-slate-800 font-medium">Implement Auth Flow</span>
+                    <CheckCircle className="w-5 h-5 text-accent" />
+                    <span className="text-primary font-medium">Implement auth flow</span>
                  </div>
                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full border-2 border-slate-200"></div>
-                    <span className="text-slate-400">Deploy to Vercel</span>
+                    <div className="w-5 h-5 rounded-full border-2 border-white/15" />
+                    <span className="text-muted">Deploy</span>
                  </div>
               </div>
            </div>
         </motion.div>
-      </header>
+      </section>
 
       {/* Features */}
-      <section id="how-it-works" className="py-24 bg-white">
+      <section id="how-it-works" className="py-20 md:py-24 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">How It Works</h2>
-            <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-              Simple, effective, and distraction-free. Focus on what matters: shipping.
+            <div className="text-xs uppercase tracking-[0.35em] text-muted mb-4">
+              Our system
+            </div>
+            <h2 className="text-3xl md:text-5xl font-semibold tracking-[-0.03em] text-primary mb-5">
+              Complex work.
+              <br className="hidden md:block" /> Elegant accountability.
+            </h2>
+            <p className="text-muted text-lg max-w-2xl mx-auto">
+              Keep goals public, progress verifiable, and cohorts aligned—without
+              adding process.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
              <FeatureCard 
-               icon={<Users className="w-8 h-8 text-indigo-600" />}
+               icon={<Users className="w-8 h-8 text-accent" />}
                title="Join a Cohort"
                description="Group up with 5-10 other founders. Share updates, get feedback, and keep each other accountable."
              />
              <FeatureCard 
-               icon={<Target className="w-8 h-8 text-blue-600" />}
+               icon={<Target className="w-8 h-8 text-accent" />}
                title="Set Weekly Goals"
                description="Commit to one major public goal every week. Break it down into verifiable tasks."
              />
              <FeatureCard 
-               icon={<Activity className="w-8 h-8 text-emerald-600" />}
+               icon={<Activity className="w-8 h-8 text-accent" />}
                title="Track Progress"
                description="Visual progress tracking. See your streak build up and celebrate small wins."
              />
@@ -114,9 +146,9 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 px-6">
+      <footer className="border-t border-white/10 text-muted py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-           <div className="text-white font-bold text-xl">Ziptech Labs</div>
+           <div className="text-primary font-semibold tracking-[-0.02em]">Ziptech Labs</div>
            <p className="text-sm">© {new Date().getFullYear()} Ziptech Labs. All rights reserved.</p>
         </div>
       </footer>
@@ -127,13 +159,13 @@ const LandingPage: React.FC = () => {
 const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
   <motion.div 
     whileHover={{ y: -5 }}
-    className="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-all"
+    className="p-8 rounded-3xl bg-surface border border-white/10 hover:border-white/20 hover:bg-white/5 transition-all"
   >
-    <div className="mb-6 bg-white w-16 h-16 rounded-xl flex items-center justify-center shadow-sm">
+    <div className="mb-6 bg-white/5 w-16 h-16 rounded-2xl flex items-center justify-center border border-white/10">
       {icon}
     </div>
-    <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-    <p className="text-slate-600 leading-relaxed">{description}</p>
+    <h3 className="text-xl font-semibold text-primary mb-3 tracking-[-0.02em]">{title}</h3>
+    <p className="text-muted leading-relaxed">{description}</p>
   </motion.div>
 );
 

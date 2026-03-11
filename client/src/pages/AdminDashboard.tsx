@@ -61,29 +61,29 @@ const AdminDashboard = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-gray-600">Loading...</div>
+                <div className="text-muted">Loading...</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white shadow-sm">
+        <div className="min-h-screen bg-background text-text">
+            <nav className="border-b border-white/10 bg-background/70 backdrop-blur">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
-                                <h1 className="text-xl font-bold text-gray-900">Ziptech Labs</h1>
-                                <span className="ml-3 px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded">
+                                <h1 className="text-xl font-semibold tracking-[-0.02em] text-primary">Ziptech Labs</h1>
+                                <span className="ml-3 px-2 py-1 text-xs font-semibold bg-white/10 text-muted rounded-full border border-white/10">
                                     Admin
                                 </span>
                             </div>
                         </div>
                         <div className="flex items-center">
-                            <span className="text-gray-700 mr-4">Welcome, {user?.name}</span>
+                            <span className="text-muted mr-4">Welcome, {user?.name}</span>
                             <button
                                 onClick={handleLogout}
-                                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                                className="text-sm font-medium text-muted hover:text-primary transition"
                             >
                                 Sign out
                             </button>
@@ -96,10 +96,10 @@ const AdminDashboard = () => {
                 <VerificationBanner visible={!user?.isVerified} />
                 <div className="px-4 py-6 sm:px-0">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+                        <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.03em] text-primary">Admin Dashboard</h2>
                         <button 
                             onClick={handleExport}
-                            className="inline-flex items-center px-4 py-2 bg-accent text-white rounded-lg hover:bg-blue-700 transition"
+                            className="inline-flex items-center px-5 py-2.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                         >
                             <Download className="w-4 h-4 mr-2" />
                             Export Reports
@@ -109,73 +109,73 @@ const AdminDashboard = () => {
                     {analytics && (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                                     <div className="flex items-center">
-                                        <div className="shrink-0 bg-blue-100 rounded-md p-3">
-                                            <Users className="h-6 w-6 text-blue-600" />
+                                        <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                                            <Users className="h-6 w-6 text-accent" />
                                         </div>
                                         <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-500">Total Cohorts</p>
-                                            <p className="text-2xl font-semibold text-gray-900">{analytics.totalCohorts}</p>
+                                            <p className="text-sm font-medium text-muted">Total Cohorts</p>
+                                            <p className="text-2xl font-semibold text-primary">{analytics.totalCohorts}</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                                     <div className="flex items-center">
-                                        <div className="shrink-0 bg-green-100 rounded-md p-3">
-                                            <TrendingUp className="h-6 w-6 text-green-600" />
+                                        <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                                            <TrendingUp className="h-6 w-6 text-accent" />
                                         </div>
                                         <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-500">Avg Completion</p>
-                                            <p className="text-2xl font-semibold text-gray-900">{analytics.avgCompletionRate}%</p>
+                                            <p className="text-sm font-medium text-muted">Avg Completion</p>
+                                            <p className="text-2xl font-semibold text-primary">{analytics.avgCompletionRate}%</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-white rounded-lg shadow p-6">
+                                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                                     <div className="flex items-center">
-                                        <div className="shrink-0 bg-purple-100 rounded-md p-3">
-                                            <BarChart3 className="h-6 w-6 text-purple-600" />
+                                        <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                                            <BarChart3 className="h-6 w-6 text-accent" />
                                         </div>
                                         <div className="ml-4">
-                                            <p className="text-sm font-medium text-gray-500">Active Users</p>
-                                            <p className="text-2xl font-semibold text-gray-900">{analytics.activeUsers}</p>
+                                            <p className="text-sm font-medium text-muted">Active Users</p>
+                                            <p className="text-2xl font-semibold text-primary">{analytics.activeUsers}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                                <div className="bg-white shadow rounded-lg p-6">
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">Platform Overview</h3>
+                                <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                                    <h3 className="text-lg font-semibold text-primary mb-4">Platform Overview</h3>
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
-                                            <span className="text-sm text-gray-600">Total Users</span>
-                                            <span className="text-sm font-semibold text-gray-900">{analytics.totalUsers}</span>
+                                            <span className="text-sm text-muted">Total Users</span>
+                                            <span className="text-sm font-semibold text-primary">{analytics.totalUsers}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-sm text-gray-600">Total Goals</span>
-                                            <span className="text-sm font-semibold text-gray-900">{analytics.totalGoals}</span>
+                                            <span className="text-sm text-muted">Total Goals</span>
+                                            <span className="text-sm font-semibold text-primary">{analytics.totalGoals}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-sm text-gray-600">Completed Goals</span>
-                                            <span className="text-sm font-semibold text-gray-900">{analytics.completedGoals}</span>
+                                            <span className="text-sm text-muted">Completed Goals</span>
+                                            <span className="text-sm font-semibold text-primary">{analytics.completedGoals}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="bg-white shadow rounded-lg p-6">
-                                    <h3 className="text-lg font-medium text-gray-900 mb-4">All Cohorts</h3>
+                                <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                                    <h3 className="text-lg font-semibold text-primary mb-4">All Cohorts</h3>
                                     <div className="space-y-2">
                                         {analytics.cohorts.map((cohort) => (
-                                            <div key={cohort.id} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded">
-                                                <span className="text-sm text-gray-900">{cohort.name}</span>
-                                                <span className="text-xs text-gray-500">{cohort.memberCount} members</span>
+                                            <div key={cohort.id} className="flex justify-between items-center p-3 bg-black/20 border border-white/10 rounded-2xl">
+                                                <span className="text-sm text-primary">{cohort.name}</span>
+                                                <span className="text-xs text-muted">{cohort.memberCount} members</span>
                                             </div>
                                         ))}
                                         {analytics.cohorts.length === 0 && (
-                                            <p className="text-sm text-gray-500 italic">No cohorts yet</p>
+                                            <p className="text-sm text-muted italic">No cohorts yet</p>
                                         )}
                                     </div>
                                 </div>

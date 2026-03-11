@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0F172A;
-  --color-accent: #2563EB;
-  --color-secondary: #10B981;
-  --color-background: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-text: #1F2937;
-  --color-muted: #6B7280;
-  --color-danger: #DC2626;
-  --color-warning: #F59E0B;
-  --color-success: #16A34A; /* Fixed hex code was #16A34A */
+  --color-primary: #E8EDF6;
+  --color-accent: #C6FF3D;
+  --color-secondary: #7DD3FC;
+  --color-background: #07080A;
+  --color-surface: #0E1116;
+  --color-text: #E8EDF6;
+  --color-muted: #A0A9B7;
+  --color-danger: #FF4D4D;
+  --color-warning: #FBBF24;
+  --color-success: #22C55E;
 
   --font-sans: Inter, sans-serif;
 }
@@ -21,5 +21,9 @@
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 30%, transparent);
   }
 }

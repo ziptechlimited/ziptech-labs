@@ -42,7 +42,7 @@ const SupportActions = ({ goalId, onSuccess }: SupportActionsProps) => {
     return (
         <div className="mt-3">
             {error && (
-                <p className="text-xs text-red-600 mb-2">{error}</p>
+                <p className="text-xs text-danger mb-2">{error}</p>
             )}
             
             {!showHelpInput ? (
@@ -50,7 +50,7 @@ const SupportActions = ({ goalId, onSuccess }: SupportActionsProps) => {
                     <button
                         onClick={() => handleSupport('support')}
                         disabled={loading}
-                        className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition disabled:opacity-50"
+                        className="inline-flex items-center px-4 py-2 text-sm bg-white/5 text-primary rounded-full border border-white/10 hover:bg-white/10 transition disabled:opacity-50"
                     >
                         <ThumbsUp className="w-4 h-4 mr-1" />
                         Support
@@ -58,7 +58,7 @@ const SupportActions = ({ goalId, onSuccess }: SupportActionsProps) => {
                     <button
                         onClick={() => setShowHelpInput(true)}
                         disabled={loading}
-                        className="inline-flex items-center px-3 py-1.5 text-sm bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition disabled:opacity-50"
+                        className="inline-flex items-center px-4 py-2 text-sm bg-white/5 text-primary rounded-full border border-white/10 hover:bg-white/10 transition disabled:opacity-50"
                     >
                         <MessageCircle className="w-4 h-4 mr-1" />
                         Offer Help
@@ -66,7 +66,7 @@ const SupportActions = ({ goalId, onSuccess }: SupportActionsProps) => {
                     <button
                         onClick={() => handleSupport('endorse')}
                         disabled={loading}
-                        className="inline-flex items-center px-3 py-1.5 text-sm bg-yellow-50 text-yellow-700 rounded-lg hover:bg-yellow-100 transition disabled:opacity-50"
+                        className="inline-flex items-center px-4 py-2 text-sm bg-white/5 text-primary rounded-full border border-white/10 hover:bg-white/10 transition disabled:opacity-50"
                     >
                         <Star className="w-4 h-4 mr-1" />
                         Endorse
@@ -78,26 +78,26 @@ const SupportActions = ({ goalId, onSuccess }: SupportActionsProps) => {
                         value={helpMessage}
                         onChange={(e) => setHelpMessage(e.target.value)}
                         maxLength={120}
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                        className="w-full px-4 py-3 text-sm border border-white/10 rounded-2xl bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                         placeholder="How can you help? (max 120 chars)"
                         rows={2}
                     />
                     <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{helpMessage.length}/120</span>
+                        <span className="text-xs text-muted">{helpMessage.length}/120</span>
                         <div className="space-x-2">
                             <button
                                 onClick={() => {
                                     setShowHelpInput(false);
                                     setHelpMessage('');
                                 }}
-                                className="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded"
+                                className="px-4 py-2 text-sm text-primary bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleHelpSubmit}
                                 disabled={!helpMessage.trim() || loading}
-                                className="px-3 py-1 text-sm bg-accent text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
+                                className="px-4 py-2 text-sm bg-accent text-black rounded-full font-semibold hover:brightness-95 transition disabled:opacity-50"
                             >
                                 Send
                             </button>

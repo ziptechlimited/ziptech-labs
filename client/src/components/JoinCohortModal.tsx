@@ -34,13 +34,13 @@ const JoinCohortModal = ({ isOpen, onClose, onSuccess }: JoinCohortModalProps) =
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <div className="bg-surface rounded-3xl border border-white/10 p-6 w-full max-w-md shadow-2xl shadow-black/40">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-900">Join a Cohort</h2>
+                    <h2 className="text-xl font-semibold tracking-[-0.02em] text-primary">Join a Cohort</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-muted hover:text-primary transition"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -48,22 +48,22 @@ const JoinCohortModal = ({ isOpen, onClose, onSuccess }: JoinCohortModalProps) =
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-muted mb-2">
                             Invite Code
                         </label>
                         <input
                             type="text"
                             value={inviteCode}
                             onChange={(e) => setInviteCode(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent"
+                            className="w-full px-4 py-3 border border-white/10 rounded-2xl bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                             placeholder="Enter invite code"
                             required
                         />
                     </div>
 
                     {error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-sm text-red-600">{error}</p>
+                        <div className="mb-4 p-3 bg-danger/10 border border-danger/30 rounded-2xl">
+                            <p className="text-sm text-danger">{error}</p>
                         </div>
                     )}
 
@@ -71,14 +71,14 @@ const JoinCohortModal = ({ isOpen, onClose, onSuccess }: JoinCohortModalProps) =
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition"
+                            className="px-5 py-2.5 text-primary bg-white/5 hover:bg-white/10 rounded-full font-semibold border border-white/10 transition"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                            className="px-5 py-2.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition disabled:opacity-50"
                         >
                             {loading ? 'Joining...' : 'Join Cohort'}
                         </button>

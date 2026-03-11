@@ -23,19 +23,19 @@ const VerificationBanner = ({ visible }: Props) => {
     }
   };
   return (
-    <div className="mb-4 p-4 rounded-lg border border-yellow-300 bg-yellow-50 flex items-center justify-between">
+    <div className="mb-4 p-4 rounded-2xl border border-warning/30 bg-warning/10 flex items-center justify-between">
       <div>
-        <p className="text-sm text-yellow-900 font-medium">
+        <p className="text-sm text-primary font-semibold">
           Please verify your email to unlock all features.
         </p>
-        <p className="text-xs text-yellow-800">
+        <p className="text-xs text-muted">
           Check your inbox or resend the verification email.
         </p>
       </div>
       <button
         onClick={resend}
         disabled={loading}
-        className="px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50"
+        className="px-4 py-2 text-sm bg-warning text-black rounded-full font-semibold hover:brightness-95 disabled:opacity-50 transition"
       >
         {loading ? 'Sending…' : 'Resend'}
       </button>

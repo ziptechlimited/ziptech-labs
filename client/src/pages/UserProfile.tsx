@@ -77,12 +77,13 @@ const UserProfile = () => {
   };
 
   if (!profile) {
-    return <div className="p-8">Loading profile...</div>;
+    return <div className="min-h-screen bg-background text-text p-8">Loading profile...</div>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="min-h-screen bg-background text-text">
+      <div className="max-w-4xl mx-auto p-6">
+      <div className="bg-surface rounded-3xl border border-white/10 p-6 mb-6">
         <div className="flex items-center">
           <img
             src={
@@ -93,20 +94,20 @@ const UserProfile = () => {
           <div className="flex-1">
             {!editing ? (
               <>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-primary">
                   {profile.name}
                 </h2>
-                <p className="text-sm text-gray-600">{profile.email}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm text-muted">{profile.email}</p>
+                <p className="text-xs text-muted mt-1">
                   Joined {new Date(profile.createdAt).toLocaleDateString()}
                 </p>
                 {profile.bio && (
-                  <p className="mt-2 text-gray-700">{profile.bio}</p>
+                  <p className="mt-2 text-muted">{profile.bio}</p>
                 )}
                 {isMe && (
                   <button
                     onClick={() => setEditing(true)}
-                    className="mt-3 px-3 py-2 bg-accent text-white rounded-md"
+                    className="mt-4 px-5 py-2.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                   >
                     Edit Profile
                   </button>
@@ -115,26 +116,26 @@ const UserProfile = () => {
             ) : (
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm text-gray-700">Name</label>
+                  <label className="text-sm text-muted">Name</label>
                   <input
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                     value={form.name || ""}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-700">Bio</label>
+                  <label className="text-sm text-muted">Bio</label>
                   <textarea
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                     value={form.bio || ""}
                     onChange={(e) => setForm({ ...form, bio: e.target.value })}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm text-gray-700">Company</label>
+                    <label className="text-sm text-muted">Company</label>
                     <input
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={form.company || ""}
                       onChange={(e) =>
                         setForm({ ...form, company: e.target.value })
@@ -142,9 +143,9 @@ const UserProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">Location</label>
+                    <label className="text-sm text-muted">Location</label>
                     <input
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={form.location || ""}
                       onChange={(e) =>
                         setForm({ ...form, location: e.target.value })
@@ -152,9 +153,9 @@ const UserProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">Website</label>
+                    <label className="text-sm text-muted">Website</label>
                     <input
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={form.website || ""}
                       onChange={(e) =>
                         setForm({ ...form, website: e.target.value })
@@ -162,9 +163,9 @@ const UserProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">Avatar URL</label>
+                    <label className="text-sm text-muted">Avatar URL</label>
                     <input
-                      className="w-full border rounded px-2 py-1"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={form.avatarUrl || ""}
                       onChange={(e) =>
                         setForm({ ...form, avatarUrl: e.target.value })
@@ -175,13 +176,13 @@ const UserProfile = () => {
                 <div className="space-x-2">
                   <button
                     onClick={save}
-                    className="px-3 py-2 bg-accent text-white rounded-md"
+                    className="px-5 py-2.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => setEditing(false)}
-                    className="px-3 py-2 bg-gray-100 rounded-md"
+                    className="px-5 py-2.5 bg-white/5 text-primary rounded-full font-semibold border border-white/10 hover:bg-white/10 transition"
                   >
                     Cancel
                   </button>
@@ -192,37 +193,37 @@ const UserProfile = () => {
         </div>
       </div>
       {stats && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-surface rounded-3xl border border-white/10 p-6">
+          <h3 className="text-lg font-semibold text-primary mb-4">
             Statistics
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-gray-50 rounded">
-              <p className="text-sm text-gray-600">Total Goals</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="p-4 bg-black/20 border border-white/10 rounded-2xl">
+              <p className="text-sm text-muted">Total Goals</p>
+              <p className="text-2xl font-semibold text-primary">
                 {stats.totalGoals}
               </p>
             </div>
-            <div className="p-4 bg-gray-50 rounded">
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="p-4 bg-black/20 border border-white/10 rounded-2xl">
+              <p className="text-sm text-muted">Completed</p>
+              <p className="text-2xl font-semibold text-primary">
                 {stats.completedGoals}
               </p>
             </div>
-            <div className="p-4 bg-gray-50 rounded">
-              <p className="text-sm text-gray-600">Completion Rate</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="p-4 bg-black/20 border border-white/10 rounded-2xl">
+              <p className="text-sm text-muted">Completion Rate</p>
+              <p className="text-2xl font-semibold text-primary">
                 {stats.completionRate}%
               </p>
             </div>
-            <div className="p-4 bg-gray-50 rounded">
-              <p className="text-sm text-gray-600">Check-ins</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="p-4 bg-black/20 border border-white/10 rounded-2xl">
+              <p className="text-sm text-muted">Check-ins</p>
+              <p className="text-2xl font-semibold text-primary">
                 {stats.checkIns.total}
               </p>
             </div>
           </div>
-          <div className="mt-4 text-sm text-gray-600">
+          <div className="mt-4 text-sm text-muted">
             <p>
               Done: {stats.checkIns.done} • Partial: {stats.checkIns.partial} •
               Not done: {stats.checkIns.notDone}
@@ -230,6 +231,7 @@ const UserProfile = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
