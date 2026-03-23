@@ -13,20 +13,20 @@ const CohortDetails = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="bg-white shadow-sm">
+        <div className="min-h-screen bg-background text-text">
+            <nav className="border-b border-white/10 bg-background/70 backdrop-blur">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
                             <div className="flex-shrink-0 flex items-center">
-                                <h1 className="text-xl font-bold text-gray-900">Ziptech Labs</h1>
+                                <h1 className="text-xl font-semibold tracking-[-0.02em] text-primary">Ziptech Labs</h1>
                             </div>
                         </div>
                         <div className="flex items-center">
-                            <span className="text-gray-700 mr-4">Welcome, {user?.name}</span>
+                            <span className="text-muted mr-4">Welcome, {user?.name}</span>
                             <button
                                 onClick={handleLogout}
-                                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                                className="text-sm font-medium text-muted hover:text-primary transition"
                             >
                                 Sign out
                             </button>
@@ -39,16 +39,16 @@ const CohortDetails = () => {
                 <div className="px-4 py-6 sm:px-0">
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+                        className="inline-flex items-center text-sm text-muted hover:text-primary mb-6 transition"
                     >
                         <ArrowLeft className="w-4 h-4 mr-1" />
                         Back to Dashboard
                     </button>
 
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Cohort Details</h2>
+                    <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.03em] text-primary mb-6">Cohort Details</h2>
                     
-                    <div className="bg-white shadow rounded-lg p-6">
-                        <p className="text-gray-500 italic">Loading cohort {id}...</p>
+                    <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                        <p className="text-muted italic">Loading cohort {id}...</p>
                     </div>
                 </div>
             </main>

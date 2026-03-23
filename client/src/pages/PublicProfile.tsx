@@ -31,12 +31,13 @@ export default function PublicProfile() {
     };
     if (slug) run();
   }, [slug]);
-  if (loading) return <div className="p-8">Loading…</div>;
-  if (error) return <div className="p-8 text-red-600">{error}</div>;
+  if (loading) return <div className="min-h-screen bg-background text-text p-8">Loading…</div>;
+  if (error) return <div className="min-h-screen bg-background text-danger p-8">{error}</div>;
   if (!user) return null;
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow p-6">
+    <main className="min-h-screen bg-background text-text">
+      <div className="max-w-3xl mx-auto p-6">
+      <div className="bg-surface rounded-3xl border border-white/10 p-6">
         <div className="flex items-center">
           <img
             src={user.avatarUrl || 'https://www.gravatar.com/avatar/?d=mp&s=128'}
@@ -44,22 +45,23 @@ export default function PublicProfile() {
             className="w-20 h-20 rounded-full mr-4"
           />
           <div>
-            <h1 className="text-2xl font-bold">{user.name}</h1>
-            {user.location && <p className="text-gray-600">{user.location}</p>}
+            <h1 className="text-2xl font-semibold tracking-[-0.03em] text-primary">{user.name}</h1>
+            {user.location && <p className="text-muted">{user.location}</p>}
           </div>
         </div>
-        {user.bio && <p className="mt-4 text-gray-800">{user.bio}</p>}
+        {user.bio && <p className="mt-4 text-muted">{user.bio}</p>}
         <div className="mt-4 space-y-1">
-          {user.company && <div className="text-sm text-gray-700">Company: {user.company}</div>}
+          {user.company && <div className="text-sm text-muted">Company: {user.company}</div>}
           {user.website && (
             <div className="text-sm">
               Website:{' '}
-              <a className="text-blue-700 underline" href={user.website} target="_blank" rel="noreferrer">
+              <a className="text-primary underline" href={user.website} target="_blank" rel="noreferrer">
                 {user.website}
               </a>
             </div>
           )}
         </div>
+      </div>
       </div>
     </main>
   );

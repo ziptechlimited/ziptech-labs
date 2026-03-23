@@ -161,34 +161,34 @@ const FacilitatorDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
 
   if (!user?.cohort) {
     return (
-      <div className="min-h-screen bg-gray-100">
-        <nav className="bg-white shadow-sm">
+      <div className="min-h-screen bg-background text-text">
+        <nav className="border-b border-white/10 bg-background/70 backdrop-blur">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex">
                 <div className="shrink-0 flex items-center">
-                  <h1 className="text-xl font-bold text-gray-900">
+                  <h1 className="text-xl font-semibold tracking-[-0.02em] text-primary">
                     Ziptech Labs
                   </h1>
-                  <span className="ml-3 px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded">
+                  <span className="ml-3 px-2 py-1 text-xs font-semibold bg-white/10 text-muted rounded-full border border-white/10">
                     Facilitator
                   </span>
                 </div>
               </div>
               <div className="flex items-center">
-                <span className="text-gray-700 mr-4">
+                <span className="text-muted mr-4">
                   Welcome, {user?.name}
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                  className="text-sm font-medium text-muted hover:text-primary transition"
                 >
                   Sign out
                 </button>
@@ -200,15 +200,18 @@ const FacilitatorDashboard = () => {
         <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <VerificationBanner visible={!user?.isVerified} />
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <div className="text-xs uppercase tracking-[0.35em] text-muted mb-4">
+              Facilitator Console
+            </div>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-[-0.03em] text-primary mb-4">
               Create Your First Cohort
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-muted mb-8 max-w-xl mx-auto">
               Get started by creating a cohort for your founders.
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className={`inline-flex items-center px-6 py-3 bg-accent text-white rounded-lg hover:bg-blue-700 transition ${!user?.isVerified ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`inline-flex items-center px-7 py-3.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition ${!user?.isVerified ? "opacity-50 cursor-not-allowed" : ""}`}
               disabled={!user?.isVerified}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -227,32 +230,32 @@ const FacilitatorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-background text-text flex flex-col">
+      <nav className="border-b border-white/10 bg-background/70 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <button
                 type="button"
-                className="mr-3 lg:hidden text-gray-600 hover:text-gray-900"
+                className="mr-3 lg:hidden text-muted hover:text-primary transition"
                 onClick={() => setSidebarOpen((v) => !v)}
               >
                 <Menu className="w-6 h-6" />
               </button>
               <div className="shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-900">
+                <h1 className="text-xl font-semibold tracking-[-0.02em] text-primary">
                   Ziptech Labs
                 </h1>
-                <span className="ml-3 px-2 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded">
+                <span className="ml-3 px-2 py-1 text-xs font-semibold bg-white/10 text-muted rounded-full border border-white/10">
                   Facilitator
                 </span>
               </div>
             </div>
             <div className="flex items-center">
-              <span className="text-gray-700 mr-4">Welcome, {user?.name}</span>
+              <span className="text-muted mr-4">Welcome, {user?.name}</span>
               <button
                 onClick={handleLogout}
-                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                className="text-sm font-medium text-muted hover:text-primary transition"
               >
                 Sign out
               </button>
@@ -263,12 +266,12 @@ const FacilitatorDashboard = () => {
 
       <main className="flex-1 max-w-7xl mx-auto w-full flex">
         <aside
-          className={`bg-white border-r border-gray-200 w-64 p-4 space-y-2 transform transition-transform duration-200 ease-in-out ${
+          className={`bg-surface border-r border-white/10 w-64 p-4 space-y-2 transform transition-transform duration-200 ease-in-out ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
           }`}
         >
           <VerificationBanner visible={!user?.isVerified} />
-          <h2 className="text-sm font-semibold text-gray-500 mb-2">
+          <h2 className="text-sm font-semibold text-muted mb-2">
             Navigation
           </h2>
           <button
@@ -276,8 +279,8 @@ const FacilitatorDashboard = () => {
             onClick={() => setActiveSection("analytics")}
             className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === "analytics"
-                ? "bg-accent text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-accent text-black"
+                : "text-muted hover:bg-white/5 hover:text-primary"
             }`}
           >
             <TrendingUp className="w-4 h-4 mr-2" />
@@ -288,8 +291,8 @@ const FacilitatorDashboard = () => {
             onClick={() => setActiveSection("cohort")}
             className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === "cohort"
-                ? "bg-accent text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-accent text-black"
+                : "text-muted hover:bg-white/5 hover:text-primary"
             }`}
           >
             <Users className="w-4 h-4 mr-2" />
@@ -300,8 +303,8 @@ const FacilitatorDashboard = () => {
             onClick={() => setActiveSection("members")}
             className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === "members"
-                ? "bg-accent text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-accent text-black"
+                : "text-muted hover:bg-white/5 hover:text-primary"
             }`}
           >
             <Users className="w-4 h-4 mr-2" />
@@ -312,8 +315,8 @@ const FacilitatorDashboard = () => {
             onClick={() => setActiveSection("chat")}
             className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === "chat"
-                ? "bg-accent text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-accent text-black"
+                : "text-muted hover:bg-white/5 hover:text-primary"
             }`}
           >
             <MessageSquare className="w-4 h-4 mr-2" />
@@ -324,8 +327,8 @@ const FacilitatorDashboard = () => {
             onClick={() => setActiveSection("meetings")}
             className={`w-full flex items-center px-3 py-2 rounded-md text-sm font-medium ${
               activeSection === "meetings"
-                ? "bg-accent text-white"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-accent text-black"
+                : "text-muted hover:bg-white/5 hover:text-primary"
             }`}
           >
             <Calendar className="w-4 h-4 mr-2" />
@@ -334,77 +337,77 @@ const FacilitatorDashboard = () => {
         </aside>
 
         <section className="flex-1 py-6 px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-[-0.03em] text-primary mb-6">
             {analytics?.cohort.name || "Facilitator Dashboard"}
           </h2>
 
           {!analytics && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-gray-600">No analytics available yet.</p>
+            <div className="bg-surface rounded-3xl border border-white/10 p-6">
+              <p className="text-muted">No analytics available yet.</p>
             </div>
           )}
 
           {analytics && activeSection === "analytics" && (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                   <div className="flex items-center">
-                    <div className="shrink-0 bg-blue-100 rounded-md p-3">
-                      <Users className="h-6 w-6 text-blue-600" />
+                    <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                      <Users className="h-6 w-6 text-accent" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-500">
+                      <p className="text-sm font-medium text-muted">
                         Total Members
                       </p>
-                      <p className="text-2xl font-semibold text-gray-900">
+                      <p className="text-2xl font-semibold text-primary">
                         {analytics.cohort.memberCount}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                   <div className="flex items-center">
-                    <div className="shrink-0 bg-green-100 rounded-md p-3">
-                      <TrendingUp className="h-6 w-6 text-green-600" />
+                    <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                      <TrendingUp className="h-6 w-6 text-accent" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-500">
+                      <p className="text-sm font-medium text-muted">
                         Completion Rate
                       </p>
-                      <p className="text-2xl font-semibold text-gray-900">
+                      <p className="text-2xl font-semibold text-primary">
                         {analytics.metrics.completionRate}%
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                   <div className="flex items-center">
-                    <div className="shrink-0 bg-purple-100 rounded-md p-3">
-                      <Calendar className="h-6 w-6 text-purple-600" />
+                    <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                      <Calendar className="h-6 w-6 text-accent" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-500">
+                      <p className="text-sm font-medium text-muted">
                         Submission Rate
                       </p>
-                      <p className="text-2xl font-semibold text-gray-900">
+                      <p className="text-2xl font-semibold text-primary">
                         {analytics.metrics.submissionRate}%
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
+                <div className="bg-surface rounded-3xl border border-white/10 p-6">
                   <div className="flex items-center">
-                    <div className="shrink-0 bg-yellow-100 rounded-md p-3">
-                      <MessageSquare className="h-6 w-6 text-yellow-600" />
+                    <div className="shrink-0 bg-white/5 rounded-2xl p-3 border border-white/10">
+                      <MessageSquare className="h-6 w-6 text-accent" />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-gray-500">
+                      <p className="text-sm font-medium text-muted">
                         Engagement Score
                       </p>
-                      <p className="text-2xl font-semibold text-gray-900">
+                      <p className="text-2xl font-semibold text-primary">
                         {analytics.metrics.engagementScore}
                       </p>
                     </div>
@@ -415,26 +418,26 @@ const FacilitatorDashboard = () => {
           )}
 
           {analytics && activeSection === "members" && (
-            <div className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-surface border border-white/10 rounded-3xl p-6">
+              <h3 className="text-lg font-semibold text-primary mb-4">
                 Cohort Members
               </h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-white/10">
                   <thead>
                     <tr>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 bg-white/5 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Name
                       </th>
-                      <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 bg-white/5 text-left text-xs font-medium text-muted uppercase tracking-wider">
                         Email
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-white/10">
                     {analytics.members.map((member) => (
                       <tr key={member._id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-primary">
                           <button
                             type="button"
                             onClick={() => navigate(`/profile/${member._id}`)}
@@ -443,7 +446,7 @@ const FacilitatorDashboard = () => {
                             {member.name}
                           </button>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted">
                           {member.email}
                         </td>
                       </tr>
@@ -456,22 +459,22 @@ const FacilitatorDashboard = () => {
 
           {activeSection === "cohort" && (
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <div className="bg-surface rounded-3xl border border-white/10 p-6">
+                <h3 className="text-lg font-semibold text-primary mb-4">
                   Cohort Invite
                 </h3>
                 {cohortDetails ? (
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Cohort</p>
-                      <p className="text-base font-semibold text-gray-900">
+                      <p className="text-sm text-muted mb-1">Cohort</p>
+                      <p className="text-base font-semibold text-primary">
                         {cohortDetails.name}
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Invite Code</p>
+                      <p className="text-sm text-muted mb-1">Invite Code</p>
                       <div className="flex items-center space-x-3">
-                        <code className="bg-gray-100 px-3 py-1 rounded text-lg font-mono text-indigo-600">
+                        <code className="bg-white/5 px-3 py-1 rounded-xl text-lg font-mono text-accent border border-white/10">
                           {cohortDetails.inviteCode || "No Code"}
                         </code>
                         {cohortDetails.inviteCode && (
@@ -479,14 +482,14 @@ const FacilitatorDashboard = () => {
                             <button
                               type="button"
                               onClick={handleCopyInviteCode}
-                              className="px-3 py-1 text-sm bg-accent text-white rounded"
+                              className="px-4 py-2 text-sm bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                             >
                               Copy
                             </button>
                             <button
                               type="button"
                               onClick={handleShareInviteEmail}
-                              className="px-3 py-1 text-sm bg-gray-100 text-gray-800 rounded"
+                              className="px-4 py-2 text-sm bg-white/5 text-primary rounded-full font-semibold border border-white/10 hover:bg-white/10 transition"
                             >
                               Share via Email
                             </button>
@@ -496,19 +499,19 @@ const FacilitatorDashboard = () => {
                     </div>
                     {cohortDetails.inviteCode && (
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">
+                        <p className="text-sm text-muted mb-1">
                           Shareable Link
                         </p>
                         <div className="flex items-center space-x-2">
                           <input
                             readOnly
                             value={`${window.location.origin}/register?invite=${cohortDetails.inviteCode}`}
-                            className="flex-1 border border-gray-200 rounded px-3 py-1 text-xs text-gray-700 bg-gray-50"
+                            className="flex-1 border border-white/10 rounded-xl px-3 py-2 text-xs text-muted bg-black/20"
                           />
                           <button
                             type="button"
                             onClick={handleCopyInviteLink}
-                            className="px-3 py-1 text-sm bg-gray-800 text-white rounded"
+                            className="px-4 py-2 text-sm bg-white/10 text-primary rounded-full font-semibold hover:bg-white/15 transition"
                           >
                             Copy Link
                           </button>
@@ -517,7 +520,7 @@ const FacilitatorDashboard = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="text-gray-600">
+                  <p className="text-muted">
                     Cohort details not available yet.
                   </p>
                 )}
@@ -527,16 +530,16 @@ const FacilitatorDashboard = () => {
 
           {activeSection === "chat" && (
             <div className="space-y-6">
-              <div className="bg-white shadow rounded-lg p-6">
+              <div className="bg-surface border border-white/10 rounded-3xl p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-semibold text-primary">
                     Check-in Session
                   </h3>
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${
                       sessionActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
+                        ? "bg-success/15 text-success"
+                        : "bg-white/10 text-muted"
                     }`}
                   >
                     {sessionActive ? "ACTIVE" : "INACTIVE"}
@@ -545,13 +548,13 @@ const FacilitatorDashboard = () => {
                 <div className="space-x-2">
                   <button
                     onClick={() => toggleSession(true)}
-                    className="px-3 py-2 bg-green-600 text-white rounded"
+                    className="px-4 py-2 bg-success text-black rounded-full font-semibold hover:brightness-95 transition"
                   >
                     Start Session
                   </button>
                   <button
                     onClick={() => toggleSession(false)}
-                    className="px-3 py-2 bg-gray-700 text-white rounded"
+                    className="px-4 py-2 bg-white/10 text-primary rounded-full font-semibold hover:bg-white/15 transition"
                   >
                     Stop Session
                   </button>
@@ -559,8 +562,8 @@ const FacilitatorDashboard = () => {
               </div>
 
               {cohortId && (
-                <div className="bg-white shadow rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                  <h3 className="text-lg font-semibold text-primary mb-4">
                     Cohort Chat
                   </h3>
                   <ChatPanel cohortId={cohortId} />
@@ -571,26 +574,26 @@ const FacilitatorDashboard = () => {
 
           {activeSection === "meetings" && (
             <div className="space-y-6">
-              <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                <h3 className="text-lg font-semibold text-primary mb-4">
                   Schedule Meeting
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm text-gray-700">Title</label>
+                    <label className="text-sm text-muted">Title</label>
                     <input
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={mTitle}
                       onChange={(e) => setMTitle(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">
+                    <label className="text-sm text-muted">
                       Duration (min)
                     </label>
                     <input
                       type="number"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={mDuration}
                       onChange={(e) =>
                         setMDuration(parseInt(e.target.value || "0"))
@@ -598,27 +601,27 @@ const FacilitatorDashboard = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="text-sm text-gray-700">Agenda</label>
+                    <label className="text-sm text-muted">Agenda</label>
                     <textarea
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={mAgenda}
                       onChange={(e) => setMAgenda(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">Date</label>
+                    <label className="text-sm text-muted">Date</label>
                     <input
                       type="date"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={mDate}
                       onChange={(e) => setMDate(e.target.value)}
                     />
                   </div>
                   <div>
-                    <label className="text-sm text-gray-700">Time</label>
+                    <label className="text-sm text-muted">Time</label>
                     <input
                       type="time"
-                      className="w-full border rounded px-3 py-2"
+                      className="w-full border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
                       value={mTime}
                       onChange={(e) => setMTime(e.target.value)}
                     />
@@ -661,38 +664,38 @@ const FacilitatorDashboard = () => {
                       }
                     }}
                     disabled={creatingMeeting}
-                    className="px-4 py-2 bg-accent text-white rounded disabled:opacity-50"
+                    className="px-6 py-2.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 disabled:opacity-50 transition"
                   >
                     {creatingMeeting ? "Scheduling…" : "Create Meeting"}
                   </button>
                 </div>
               </div>
 
-              <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                <h3 className="text-lg font-semibold text-primary mb-4">
                   Upcoming Meetings
                 </h3>
                 <div className="space-y-3">
                   {meetings.map((m) => (
                     <div
                       key={m._id}
-                      className="border border-gray-200 rounded p-4 flex justify-between items-start"
+                      className="border border-white/10 rounded-2xl p-5 bg-black/20 flex justify-between items-start"
                     >
                       <div>
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-semibold text-primary">
                           {m.title}
                         </div>
                         {m.agenda && (
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted">
                             {m.agenda}
                           </div>
                         )}
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-muted">
                           {format(new Date(m.scheduledAt), "PPpp")} •{" "}
                           {m.duration} min
                         </div>
                         {m.meetLink && (
-                          <div className="mt-2 text-xs text-blue-600">
+                          <div className="mt-2 text-xs text-primary">
                             <a
                               href={m.meetLink}
                               target="_blank"
@@ -703,7 +706,7 @@ const FacilitatorDashboard = () => {
                             </a>
                             <button
                               type="button"
-                              className="text-blue-700 underline"
+                              className="text-primary underline"
                               onClick={async () => {
                                 try {
                                   await navigator.clipboard.writeText(
@@ -741,7 +744,7 @@ const FacilitatorDashboard = () => {
                               toast.error(msg);
                             }
                           }}
-                          className="px-3 py-1 text-xs bg-gray-800 text-white rounded"
+                          className="px-3 py-1 text-xs bg-white/10 text-primary rounded-full font-semibold hover:bg-white/15 transition"
                         >
                           Generate Invite
                         </button>
@@ -782,7 +785,7 @@ const FacilitatorDashboard = () => {
                               toast.error(msg);
                             }
                           }}
-                          className="px-3 py-1 text-xs bg-blue-600 text-white rounded"
+                          className="px-3 py-1 text-xs bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                         >
                           Edit
                         </button>
@@ -804,7 +807,7 @@ const FacilitatorDashboard = () => {
                               toast.error(msg);
                             }
                           }}
-                          className="px-3 py-1 text-xs bg-red-600 text-white rounded"
+                          className="px-3 py-1 text-xs bg-danger text-black rounded-full font-semibold hover:brightness-95 transition"
                         >
                           Delete
                         </button>
@@ -812,7 +815,7 @@ const FacilitatorDashboard = () => {
                     </div>
                   ))}
                   {meetings.length === 0 && (
-                    <div className="text-gray-500 italic">
+                    <div className="text-muted italic">
                       No meetings scheduled
                     </div>
                   )}
@@ -820,8 +823,8 @@ const FacilitatorDashboard = () => {
               </div>
 
               {cohortId && (
-                <div className="bg-white shadow rounded-lg p-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <div className="bg-surface border border-white/10 rounded-3xl p-6">
+                  <h3 className="text-lg font-semibold text-primary mb-4">
                     Member Calendar View
                   </h3>
                   <MeetingsList cohortId={cohortId} />

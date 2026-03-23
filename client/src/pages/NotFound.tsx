@@ -3,13 +3,14 @@ import { Home } from 'lucide-react';
 
 const NotFound = () => {
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-background text-text flex items-center justify-center px-4">
             <div className="text-center">
-                <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
-                <p className="text-xl text-gray-600 mb-8">Page not found</p>
+                <div className="text-xs uppercase tracking-[0.35em] text-muted mb-4">Ziptech Labs</div>
+                <h1 className="text-6xl font-semibold tracking-[-0.03em] text-primary mb-4">404</h1>
+                <p className="text-lg text-muted mb-8">Page not found</p>
                 <Link
                     to="/"
-                    className="inline-flex items-center px-6 py-3 bg-accent text-white rounded-lg hover:bg-blue-700 transition"
+                    className="inline-flex items-center px-7 py-3.5 bg-accent text-black rounded-full font-semibold hover:brightness-95 transition"
                 >
                     <Home className="w-5 h-5 mr-2" />
                     Back to Home

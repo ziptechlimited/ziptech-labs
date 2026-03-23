@@ -107,36 +107,36 @@ const ChatPanel = ({ cohortId }: Props) => {
       alert(e.response?.data?.message || "Failed to send");
     }
   };
-  if (loading) return <div className="text-gray-500">Loading chat…</div>;
+  if (loading) return <div className="text-muted">Loading chat…</div>;
   if (!data) return null;
   return (
     <div className="space-y-3">
       {!data.isCheckInDay && (
-        <div className="p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
+        <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-sm text-muted">
           Chat is limited to check-in day. You can still read past messages.
         </div>
       )}
       {data.sessionActive && (
-        <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
+        <div className="p-3 bg-success/10 border border-success/25 rounded-2xl text-xs text-success">
           Live session is active
         </div>
       )}
       {onlineUsers.length > 0 && (
-        <div className="text-xs text-gray-600">
+        <div className="text-xs text-muted">
           {onlineUsers.length} online:{" "}
           {onlineUsers.map((u) => u.name).join(", ")}
         </div>
       )}
       <div className="max-h-96 overflow-y-auto space-y-2">
         {data.messages.length === 0 ? (
-          <div className="text-gray-500 italic">No messages yet</div>
+          <div className="text-muted italic">No messages yet</div>
         ) : (
           data.messages.map((m) => (
             <div
               key={m._id}
-              className="border border-gray-200 rounded p-3 bg-white"
+              className="border border-white/10 rounded-2xl p-4 bg-black/20"
             >
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="text-sm font-semibold text-primary">
                 <button
                   type="button"
                   onClick={() => {
@@ -149,8 +149,8 @@ const ChatPanel = ({ cohortId }: Props) => {
                   {m.user.name}
                 </button>
               </div>
-              <div className="text-gray-800">{m.content}</div>
-              <div className="text-xs text-gray-400">
+              <div className="text-primary">{m.content}</div>
+              <div className="text-xs text-muted">
                 {new Date(m.createdAt).toLocaleString()}
               </div>
             </div>
@@ -158,11 +158,11 @@ const ChatPanel = ({ cohortId }: Props) => {
         )}
       </div>
       {typingUser && (
-        <div className="text-xs text-gray-500">{typingUser} is typing…</div>
+        <div className="text-xs text-muted">{typingUser} is typing…</div>
       )}
       <div className="flex space-x-2">
         <input
-          className="flex-1 border border-gray-300 rounded px-3 py-2"
+          className="flex-1 border border-white/10 rounded-2xl px-4 py-3 bg-black/20 text-primary placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent/40"
           value={text}
           onChange={(e) => {
             setText(e.target.value);
@@ -186,7 +186,7 @@ const ChatPanel = ({ cohortId }: Props) => {
         <button
           onClick={send}
           disabled={(!data.isCheckInDay && !data.sessionActive) || !text.trim()}
-          className="px-4 py-2 bg-accent text-white rounded disabled:opacity-50"
+          className="px-5 py-3 bg-accent text-black rounded-2xl font-semibold hover:brightness-95 disabled:opacity-50 transition"
         >
           Send
         </button>

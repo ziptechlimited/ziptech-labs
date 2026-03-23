@@ -49,21 +49,21 @@ const MeetingsList = ({ cohortId }: MeetingsListProps) => {
     };
 
     if (loading) {
-        return <div className="text-gray-500">Loading meetings...</div>;
+        return <div className="text-muted">Loading meetings...</div>;
     }
 
     if (meetings.length === 0) {
-        return <div className="text-gray-500 italic">No upcoming meetings</div>;
+        return <div className="text-muted italic">No upcoming meetings</div>;
     }
 
     return (
         <div className="space-y-4">
             {meetings.map((meeting) => (
-                <div key={meeting._id} className="bg-white border border-gray-200 rounded-lg p-4">
+                <div key={meeting._id} className="bg-black/20 border border-white/10 rounded-2xl p-5">
                     <div className="flex items-start justify-between mb-3">
                         <div>
-                            <h4 className="font-semibold text-gray-900">{meeting.title}</h4>
-                            <div className="flex items-center text-sm text-gray-600 mt-1">
+                            <h4 className="font-semibold text-primary">{meeting.title}</h4>
+                            <div className="flex items-center text-sm text-muted mt-1">
                                 <Calendar className="w-4 h-4 mr-1" />
                                 {new Date(meeting.scheduledAt).toLocaleDateString('en-US', {
                                     weekday: 'short',
@@ -79,37 +79,37 @@ const MeetingsList = ({ cohortId }: MeetingsListProps) => {
                     </div>
 
                     {meeting.agenda && (
-                        <p className="text-sm text-gray-700 mb-3">{meeting.agenda}</p>
+                        <p className="text-sm text-muted mb-3">{meeting.agenda}</p>
                     )}
 
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-gray-600">
+                        <div className="flex items-center text-sm text-muted">
                             <Users className="w-4 h-4 mr-1" />
                             {meeting.rsvps.filter(r => r.status === 'yes').length} attending
                         </div>
                         <div className="flex space-x-2">
                             <button
                                 onClick={() => handleRSVP(meeting._id, 'yes')}
-                                className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
+                                className="px-3 py-1 text-xs bg-success/15 text-success rounded-full border border-success/25 hover:bg-success/20 transition"
                             >
                                 Yes
                             </button>
                             <button
                                 onClick={() => handleRSVP(meeting._id, 'maybe')}
-                                className="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition"
+                                className="px-3 py-1 text-xs bg-warning/15 text-warning rounded-full border border-warning/25 hover:bg-warning/20 transition"
                             >
                                 Maybe
                             </button>
                             <button
                                 onClick={() => handleRSVP(meeting._id, 'no')}
-                                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
+                                className="px-3 py-1 text-xs bg-white/10 text-muted rounded-full border border-white/10 hover:bg-white/15 transition"
                             >
                                 No
                             </button>
                         </div>
                     </div>
                     {meeting.rsvps.length > 0 && (
-                        <div className="mt-3 text-xs text-gray-600">
+                        <div className="mt-3 text-xs text-muted">
                             Attendees:{" "}
                             {meeting.rsvps
                                 .filter(r => r.status === 'yes')
@@ -130,7 +130,7 @@ const MeetingsList = ({ cohortId }: MeetingsListProps) => {
                                 href={meeting.meetLink}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-blue-600 hover:underline mr-2"
+                                className="text-primary hover:underline mr-2"
                             >
                                 Join via Google Meet
                             </a>

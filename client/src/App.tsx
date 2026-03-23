@@ -10,6 +10,9 @@ import CohortDetails from "./pages/CohortDetails";
 import NotFound from "./pages/NotFound";
 import UserProfile from "./pages/UserProfile";
 import PublicProfile from "./pages/PublicProfile";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Address from "./pages/Address";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -22,7 +25,7 @@ const PrivateRoute = ({ children, allowedRoles = [] }: PrivateRouteProps) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-muted">Loading...</div>
       </div>
     );
   }
@@ -53,6 +56,9 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/address" element={<Address />} />
 
       {/* Public Routes */}
       <Route
