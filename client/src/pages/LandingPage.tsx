@@ -16,6 +16,32 @@ const LandingPage: React.FC = () => {
               Labs
             </span>
           </Link>
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              to="/"
+              className="text-sm font-medium text-muted hover:text-primary transition"
+            >
+              Home
+            </Link>
+            <Link
+              to="/about"
+              className="text-sm font-medium text-muted hover:text-primary transition"
+            >
+              About
+            </Link>
+            <Link
+              to="/contact"
+              className="text-sm font-medium text-muted hover:text-primary transition"
+            >
+              Contact
+            </Link>
+            <Link
+              to="/address"
+              className="text-sm font-medium text-muted hover:text-primary transition"
+            >
+              Address
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
             <Link
               to="/login"
