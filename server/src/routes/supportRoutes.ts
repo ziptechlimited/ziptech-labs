@@ -1,6 +1,7 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware';
 import Support from '../models/Support';
+import Goal from '../models/Goal';
 import { requireVerified } from '../middleware/verifiedMiddleware';
 
 const router = express.Router();
@@ -17,6 +18,21 @@ router.post('/:goalId', protect, requireVerified, async (req, res) => {
             return res.status(401).json({ message: 'Not authenticated' });
         }
 
+        if (!['support', 'help', 'endorse'].includes(type)) {
+            return res.status(400).json({ message: 'Invalid support type' });
+        }
+
+        const goal = await Goal.findById(goalId);
+        if (!goal || goal.type !== 'public') {
+            return res.status(404).json({ message: 'Goal not found' });
+        }
+        if (goal.user.toString() === req.user._id.toString()) {
+            return res.status(400).json({ message: 'You cannot back your own commitment' });
+        }
+        if (type === 'help' && !String(message ?? '').trim()) {
+            return res.status(400).json({ message: 'Tell them how you can help' });
+        }
+
         // Get current week
         const now = new Date();
         const start = new Date(now.getFullYear(), 0, 1);
@@ -28,11 +44,12 @@ router.post('/:goalId', protect, requireVerified, async (req, res) => {
         const existing = await Support.findOne({
             goal: goalId,
             user: req.user.id,
+            type,
             week
         });
 
         if (existing) {
-            return res.status(400).json({ message: 'Already supported this goal this week' });
+            return res.status(400).json({ message: `You already sent ${({ support: 'support', endorse: 'an endorsement', help: 'a help offer' } as Record<string, string>)[type]} on this commitment` });
         }
 
         const support = await Support.create({

@@ -2,7 +2,10 @@ export enum UserRole {
   FOUNDER = "founder",
   FACILITATOR = "facilitator",
   ADMIN = "admin",
+  INVESTOR = "investor",
 }
+
+export type CompanyStage = "idea" | "pre-seed" | "seed" | "series-a" | "growth";
 
 export interface IUser {
   _id: string;
@@ -16,6 +19,16 @@ export interface IUser {
   website?: string;
   location?: string;
   slug?: string;
+  headline?: string;
+  companyOneLiner?: string;
+  sector?: string;
+  stage?: CompanyStage;
+  fundraising?: boolean;
+  raiseAmount?: string;
+  linkedin?: string;
+  twitter?: string;
+  isProfilePublic?: boolean;
+  watchlist?: string[];
   cohort?: string | ICohort;
   goals?: string[] | IGoal[];
   isVerified?: boolean;

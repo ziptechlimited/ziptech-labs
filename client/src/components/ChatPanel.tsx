@@ -1,12 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { API_CONFIG } from "../config/api";
+import toast from "react-hot-toast";
 import { io, Socket } from "socket.io-client";
+import { Pin, Send } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { API, cn, errorMessage } from "../lib/api";
+import { Avatar } from "./ui/primitives";
 
 interface ChatMessage {
   _id: string;
-  user: { _id: string; name: string };
+  user: { _id: string; name: string; slug?: string };
   content: string;
   createdAt: string;
   isPinned?: boolean;
@@ -18,179 +22,151 @@ interface ChatResponse {
   sessionActive?: boolean;
 }
 
-interface Props {
-  cohortId: string;
-}
-
-const ChatPanel = ({ cohortId }: Props) => {
+const ChatPanel = ({ cohortId, moderator = false }: { cohortId: string; moderator?: boolean }) => {
   const { user } = useAuth();
   const [data, setData] = useState<ChatResponse | null>(null);
-  const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
-  const [onlineUsers, setOnlineUsers] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
+  const [onlineUsers, setOnlineUsers] = useState<Array<{ id: string; name: string }>>([]);
   const [typingUser, setTypingUser] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const typingTimeoutRef = useRef<number | undefined>(undefined);
+  const listRef = useRef<HTMLDivElement>(null);
+  const userId = user?._id;
+
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(
-        `${API_CONFIG.BASE_URL}/messages/${cohortId}/messages`,
-      );
+      const res = await axios.get(`${API}/messages/${cohortId}/messages`);
       setData(res.data);
-    } finally {
-      setLoading(false);
+    } catch (e) {
+      toast.error(errorMessage(e, "Couldn't load chat"));
     }
   };
+
   useEffect(() => {
     fetchMessages();
-    const s = io((API_CONFIG.BASE_URL as string).replace("/api", ""));
+    const s = io(API.replace(/\/api\/?$/, ""));
     socketRef.current = s;
-    const userId = (user as any)?._id || (user as any)?.id;
-    s.emit("join-cohort", {
-      cohortId,
-      userId,
-      name: user?.name,
-    });
+    s.emit("join-cohort", { cohortId, userId, name: user?.name });
     s.on("message", (payload: any) => {
-      setData((prev) =>
-        prev
-          ? { ...prev, messages: [...prev.messages, payload.message] }
-          : prev,
-      );
+      setData((prev) => (prev && !prev.messages.some((m) => m._id === payload.message._id) ? { ...prev, messages: [...prev.messages, payload.message] } : prev));
     });
-    s.on("session", (p: any) => {
-      setData((prev) =>
-        prev
-          ? ({
-              ...prev,
-              isCheckInDay: prev.isCheckInDay,
-              sessionActive: p.active,
-            } as any)
-          : prev,
-      );
-    });
-    s.on("presence", (payload: any) => {
-      if (Array.isArray(payload?.users)) {
-        setOnlineUsers(payload.users);
-      }
-    });
+    s.on("session", (p: any) => setData((prev) => (prev ? { ...prev, sessionActive: p.active } : prev)));
+    s.on("presence", (payload: any) => Array.isArray(payload?.users) && setOnlineUsers(payload.users));
     s.on("typing", (payload: any) => {
-      const currentId = userId?.toString();
-      if (!payload?.userId || payload.userId.toString() === currentId) {
-        return;
-      }
-      if (typingTimeoutRef.current) {
-        window.clearTimeout(typingTimeoutRef.current);
-      }
+      if (!payload?.userId || String(payload.userId) === String(userId)) return;
+      window.clearTimeout(typingTimeoutRef.current);
       setTypingUser(payload.name || "Someone");
-      typingTimeoutRef.current = window.setTimeout(() => {
-        setTypingUser(null);
-      }, 2000);
+      typingTimeoutRef.current = window.setTimeout(() => setTypingUser(null), 2000);
     });
     return () => {
       s.emit("leave-cohort", { cohortId, userId });
       s.disconnect();
     };
-  }, [cohortId, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cohortId, userId]);
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
+  }, [data?.messages.length]);
+
+  const open = !!data && (data.isCheckInDay || !!data.sessionActive);
+
   const send = async () => {
     if (!text.trim()) return;
     try {
-      await axios.post(`${API_CONFIG.BASE_URL}/messages/${cohortId}/messages`, {
-        content: text.trim(),
-      });
+      const res = await axios.post(`${API}/messages/${cohortId}/messages`, { content: text.trim() });
       setText("");
-      fetchMessages();
-    } catch (e: any) {
-      // Surface server message (e.g., not check-in day)
-      alert(e.response?.data?.message || "Failed to send");
+      setData((prev) => (prev && !prev.messages.some((m) => m._id === res.data._id) ? { ...prev, messages: [...prev.messages, res.data] } : prev));
+    } catch (e) {
+      toast.error(errorMessage(e, "Failed to send"));
     }
   };
-  if (loading) return <div className="text-gray-500">Loading chat…</div>;
-  if (!data) return null;
+
+  const moderate = async (id: string, action: "pin" | "mute") => {
+    try {
+      await axios.patch(`${API}/messages/messages/${id}/${action}`);
+      fetchMessages();
+    } catch (e) {
+      toast.error(errorMessage(e));
+    }
+  };
+
+  if (!data) return <p className="py-8 text-center text-sm text-faint">Loading chat…</p>;
+
+  const pinned = data.messages.filter((m) => m.isPinned);
+
   return (
-    <div className="space-y-3">
-      {!data.isCheckInDay && (
-        <div className="p-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-700">
-          Chat is limited to check-in day. You can still read past messages.
+    <div className="flex flex-col">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <span className={cn("pill", open ? "pill-lime" : "")}>
+          <span className={cn("h-1.5 w-1.5 rounded-full", open ? "bg-lime" : "bg-white/30")} />
+          {data.sessionActive ? "Live session" : data.isCheckInDay ? "Check-in day · open" : "Opens on check-in day"}
+        </span>
+        {onlineUsers.length > 0 && <span className="text-faint">{onlineUsers.length} online · {onlineUsers.map((u) => u.name.split(" ")[0]).join(", ")}</span>}
+      </div>
+
+      {pinned.length > 0 && (
+        <div className="mb-3 space-y-1.5">
+          {pinned.map((m) => (
+            <p key={m._id} className="flex items-start gap-2 rounded-xl border border-gold/20 bg-gold/[0.05] px-3 py-2 text-sm text-ink">
+              <Pin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold" />
+              <span><span className="text-subtle">{m.user.name}:</span> {m.content}</span>
+            </p>
+          ))}
         </div>
       )}
-      {data.sessionActive && (
-        <div className="p-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
-          Live session is active
-        </div>
-      )}
-      {onlineUsers.length > 0 && (
-        <div className="text-xs text-gray-600">
-          {onlineUsers.length} online:{" "}
-          {onlineUsers.map((u) => u.name).join(", ")}
-        </div>
-      )}
-      <div className="max-h-96 overflow-y-auto space-y-2">
+
+      <div ref={listRef} className="scroll-thin max-h-[420px] min-h-[200px] space-y-4 overflow-y-auto pr-1">
         {data.messages.length === 0 ? (
-          <div className="text-gray-500 italic">No messages yet</div>
+          <p className="py-12 text-center text-sm text-faint">No messages this week yet.</p>
         ) : (
-          data.messages.map((m) => (
-            <div
-              key={m._id}
-              className="border border-gray-200 rounded p-3 bg-white"
-            >
-              <div className="text-sm font-semibold text-gray-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (m.user?._id) {
-                      window.location.href = `/profile/${m.user._id}`;
-                    }
-                  }}
-                  className="text-primary hover:underline"
-                >
-                  {m.user.name}
-                </button>
+          data.messages.map((m) => {
+            const isMe = m.user?._id === userId;
+            return (
+              <div key={m._id} className={cn("group flex gap-3", isMe && "flex-row-reverse")}>
+                <Avatar name={m.user?.name} size={30} />
+                <div className={cn("max-w-[80%]", isMe && "text-right")}>
+                  <p className="text-[11px] text-faint">
+                    {m.user?.slug ? <Link to={`/f/${m.user.slug}`} className="hover:text-ink">{m.user.name}</Link> : m.user?.name} ·{" "}
+                    {new Date(m.createdAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+                  </p>
+                  <p className={cn("mt-1 inline-block rounded-2xl px-3.5 py-2 text-left text-sm", isMe ? "bg-lime/15 text-ink" : "bg-white/[0.05] text-ink")}>{m.content}</p>
+                  {moderator && (
+                    <span className="ml-2 hidden gap-2 text-[11px] text-faint group-hover:inline-flex">
+                      <button type="button" onClick={() => moderate(m._id, "pin")} className="hover:text-gold">{m.isPinned ? "Unpin" : "Pin"}</button>
+                      <button type="button" onClick={() => moderate(m._id, "mute")} className="hover:text-danger">Hide</button>
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="text-gray-800">{m.content}</div>
-              <div className="text-xs text-gray-400">
-                {new Date(m.createdAt).toLocaleString()}
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
-      {typingUser && (
-        <div className="text-xs text-gray-500">{typingUser} is typing…</div>
-      )}
-      <div className="flex space-x-2">
+
+      <p className="h-5 pt-1 text-xs text-faint">{typingUser && `${typingUser} is typing…`}</p>
+      <form
+        className="mt-1 flex gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          send();
+        }}
+      >
         <input
-          className="flex-1 border border-gray-300 rounded px-3 py-2"
+          className="input"
           value={text}
+          maxLength={500}
           onChange={(e) => {
             setText(e.target.value);
-            const s = socketRef.current;
-            const userId = (user as any)?._id || (user as any)?.id;
-            if (s && cohortId && userId) {
-              s.emit("typing", {
-                cohortId,
-                userId,
-                name: user?.name,
-              });
-            }
+            socketRef.current?.emit("typing", { cohortId, userId, name: user?.name });
           }}
-          placeholder={
-            data.isCheckInDay || data.sessionActive
-              ? "Write a message…"
-              : "Chat locked until check-in day"
-          }
-          disabled={!data.isCheckInDay && !data.sessionActive}
+          placeholder={open ? "Share a win, a blocker, or an ask…" : "Chat opens on check-in day (Monday) or during a live session"}
+          disabled={!open}
         />
-        <button
-          onClick={send}
-          disabled={(!data.isCheckInDay && !data.sessionActive) || !text.trim()}
-          className="px-4 py-2 bg-accent text-white rounded disabled:opacity-50"
-        >
-          Send
+        <button type="submit" disabled={!open || !text.trim()} className="btn btn-primary shrink-0 px-3" aria-label="Send">
+          <Send className="h-4 w-4" />
         </button>
-      </div>
+      </form>
     </div>
   );
 };

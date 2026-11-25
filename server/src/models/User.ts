@@ -36,6 +36,19 @@ const UserSchema: Schema<IUserDocument> = new Schema(
     company: { type: String, maxlength: 120 },
     website: { type: String, maxlength: 200 },
     location: { type: String, maxlength: 120 },
+    headline: { type: String, maxlength: 140 },
+    companyOneLiner: { type: String, maxlength: 160 },
+    sector: { type: String, maxlength: 60 },
+    stage: {
+      type: String,
+      enum: ["idea", "pre-seed", "seed", "series-a", "growth"],
+    },
+    fundraising: { type: Boolean, default: false },
+    raiseAmount: { type: String, maxlength: 40 },
+    linkedin: { type: String, maxlength: 200 },
+    twitter: { type: String, maxlength: 200 },
+    isProfilePublic: { type: Boolean, default: true },
+    watchlist: [{ type: Schema.Types.ObjectId, ref: "User" }],
     slug: { type: String, unique: true, sparse: true },
     isVerified: {
       type: Boolean,
@@ -83,14 +96,20 @@ UserSchema.methods.matchPassword = async function (
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model<IUserDocument>("User", UserSchema);
-export default User;
-
-// Ensure slug is set
-UserSchema.pre("save", function (next) {
+// Ensure a unique slug is set (used for public report URLs)
+UserSchema.pre("save", async function (next) {
   if (!this.isModified("name") && this.slug) return next();
-  const base = this.name || "";
-  const s = slugify(base, { lower: true, strict: true });
-  if (s) (this as any).slug = s;
+  const base = slugify(this.name || "", { lower: true, strict: true }) || "founder";
+  let candidate = base;
+  let n = 1;
+  const Model = this.constructor as Model<IUserDocument>;
+  while (await Model.exists({ slug: candidate, _id: { $ne: this._id } })) {
+    n += 1;
+    candidate = `${base}-${n}`;
+  }
+  this.slug = candidate;
   next();
 });
+
+const User = mongoose.model<IUserDocument>("User", UserSchema);
+export default User;

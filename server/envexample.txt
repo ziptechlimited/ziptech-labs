@@ -1,0 +1,10 @@
+PORT= number
+MONGO_URI=mongodb://localhost:27017/ziptech-labs
+JWT_SECRET=your_jwt_secret_key_here
+SMTP_HOST=your email host 
+SMTP_PORT=your email port(number)
+SMTP_USER= User email
+SMTP_PASS= email App passwod 
+EMAIL_FROM=Ziptech Labs no-reply@yourdomain.com
+APP_BASE_URL=http://localhost:5001
+CLIENT_URL=http://localhost:5173

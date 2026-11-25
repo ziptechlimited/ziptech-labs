@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import Goal from '../models/Goal';
 import Cohort from '../models/Cohort';
+import Support from '../models/Support';
+import CheckIn from '../models/CheckIn';
 
-// Helper to get current week number
-const getWeekNumber = (startDate: Date): number => {
-    const now = new Date();
-    const start = new Date(startDate);
-    const diffTime = Math.abs(now.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.ceil(diffDays / 7);
+// Cohort week number, 1-based from the cohort start date.
+export const getWeekNumber = (startDate: Date, now: Date = new Date()): number => {
+    const diff = now.getTime() - new Date(startDate).getTime();
+    if (diff < 0) return 1;
+    return Math.floor(diff / (1000 * 60 * 60 * 24 * 7)) + 1;
 };
 
 // @desc    Create a goal (Public or Private)
@@ -20,6 +20,11 @@ export const createGoal = async (req: Request, res: Response): Promise<void> => 
     try {
         if (!['public', 'private'].includes(type)) {
             res.status(400).json({ message: 'Invalid goal type' });
+            return;
+        }
+
+        if (!description || !String(description).trim()) {
+            res.status(400).json({ message: 'Describe the commitment' });
             return;
         }
 
@@ -53,25 +58,34 @@ export const createGoal = async (req: Request, res: Response): Promise<void> => 
             user: req.user._id,
             cohort: req.user.cohort,
             type,
-            description,
+            description: String(description).trim(),
             weekNumber,
-            subTasks: subTasks || []
+            subTasks: Array.isArray(subTasks)
+                ? subTasks
+                    .filter((t: any) => t && String(t.description ?? '').trim())
+                    .slice(0, 10)
+                    .map((t: any) => ({ description: String(t.description).trim(), completed: false }))
+                : []
         });
 
         res.status(201).json(goal);
-    } catch (error) {
+    } catch (error: any) {
+        if (error?.name === 'ValidationError') {
+            res.status(400).json({ message: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-// @desc    Get goals
+// @desc    Get this week's goals: mine (public + private) and the cohort's public goals
 // @route   GET /api/goals
 // @access  Private
 export const getGoals = async (req: Request, res: Response): Promise<void> => {
     try {
         if (!req.user?.cohort) {
-            res.status(200).json([]);
+            res.status(200).json({ week: null, myGoals: [], publicGoals: [], myPrivateGoal: null });
             return;
         }
 
@@ -80,41 +94,61 @@ export const getGoals = async (req: Request, res: Response): Promise<void> => {
              res.status(404).json({ message: 'Cohort not found' });
              return;
         }
-        
+
         const currentWeek = getWeekNumber(cohort.startDate);
+        const userId = req.user._id.toString();
 
-        if (req.query.mine === 'true') {
-             const myGoals = await Goal.find({ user: req.user._id, weekNumber: currentWeek });
-             res.status(200).json(myGoals);
-             return;
-        }
+        const [myGoals, publicGoals] = await Promise.all([
+            Goal.find({ user: req.user._id, weekNumber: currentWeek }).lean(),
+            Goal.find({ cohort: req.user.cohort, weekNumber: currentWeek, type: 'public' })
+                .populate('user', 'name slug company avatarUrl')
+                .sort({ createdAt: -1 })
+                .lean(),
+        ]);
 
-        const publicGoals = await Goal.find({
-            cohort: req.user.cohort,
-            weekNumber: currentWeek,
-            type: 'public'
-        }).populate('user', 'name');
+        const goalIds = [...myGoals, ...publicGoals].map((g: any) => g._id);
+        const [supports, checkIns] = await Promise.all([
+            Support.find({ goal: { $in: goalIds } }).populate('user', 'name slug').sort({ createdAt: -1 }).lean(),
+            CheckIn.find({ goal: { $in: goalIds } }).lean(),
+        ]);
 
-        const myPrivateGoal = await Goal.findOne({
-            user: req.user._id,
-            weekNumber: currentWeek,
-            type: 'private'
-        });
-
-        const results = {
-            week: currentWeek,
-            publicGoals,
-            myPrivateGoal
+        const decorate = (g: any) => {
+            const id = String(g._id);
+            const mine = supports.filter((s: any) => String(s.goal) === id);
+            const checkIn = checkIns.find((c: any) => String(c.goal) === id);
+            return {
+                ...g,
+                checkIn: checkIn ? { status: checkIn.status, blockerNote: checkIn.blockerNote, createdAt: checkIn.createdAt } : null,
+                peer: {
+                    endorse: mine.filter((s: any) => s.type === 'endorse').length,
+                    support: mine.filter((s: any) => s.type === 'support').length,
+                    help: mine.filter((s: any) => s.type === 'help').length,
+                },
+                helpOffers: mine
+                    .filter((s: any) => s.type === 'help' && s.message)
+                    .map((s: any) => ({ user: s.user, message: s.message, createdAt: s.createdAt })),
+                mySupport: mine.filter((s: any) => String(s.user?._id ?? s.user) === userId).map((s: any) => s.type),
+            };
         };
 
-        res.status(200).json(results);
+        const decoratedMine = myGoals.map(decorate);
+        res.status(200).json({
+            week: currentWeek,
+            cohortStart: cohort.startDate,
+            myGoals: decoratedMine,
+            myPrivateGoal: decoratedMine.find((g: any) => g.type === 'private') ?? null,
+            publicGoals: publicGoals
+                .filter((g: any) => String(g.user?._id ?? g.user) !== userId)
+                .map(decorate),
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }
 };
 
-// @desc    Update goal status
+// @desc    Update a goal's subtasks (or wording while still pending).
+//          Outcomes are recorded only through check-ins so the record stays trustworthy.
 // @route   PATCH /api/goals/:id
 // @access  Private
 export const updateGoal = async (req: Request, res: Response): Promise<void> => {
@@ -132,14 +166,32 @@ export const updateGoal = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        const updatedGoal = await Goal.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
+        const { subTasks, description } = req.body as {
+            subTasks?: { description: string; completed: boolean }[];
+            description?: string;
+        };
 
+        if (Array.isArray(subTasks)) {
+            goal.subTasks = subTasks
+                .filter((t) => t && String(t.description ?? '').trim())
+                .slice(0, 10)
+                .map((t) => ({ description: String(t.description).trim(), completed: !!t.completed }));
+        }
+        if (typeof description === 'string') {
+            if (goal.status !== 'pending') {
+                res.status(400).json({ message: 'A resolved commitment cannot be reworded' });
+                return;
+            }
+            goal.description = description.trim();
+        }
+
+        const updatedGoal = await goal.save();
         res.status(200).json(updatedGoal);
-    } catch (error) {
+    } catch (error: any) {
+        if (error?.name === 'ValidationError') {
+            res.status(400).json({ message: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ message: 'Server error' });
     }

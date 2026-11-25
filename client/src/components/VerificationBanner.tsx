@@ -1,47 +1,43 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { API_CONFIG } from '../config/api';
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { MailCheck } from "lucide-react";
+import { API, errorMessage } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 
-interface Props {
-  visible: boolean;
-}
-
-const VerificationBanner = ({ visible }: Props) => {
+const VerificationBanner = () => {
+  const { refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  if (!visible) return null;
+
   const resend = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_CONFIG.BASE_URL}/auth/send-verification`);
-      toast.success('Verification email sent');
-    } catch (e: any) {
-      const msg = e.response?.data?.message || 'Failed to send';
-      toast.error(msg);
+      await axios.post(`${API}/auth/send-verification`);
+      toast.success("Verification email sent");
+    } catch (e) {
+      toast.error(errorMessage(e, "Failed to send"));
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <div className="mb-4 p-4 rounded-lg border border-yellow-300 bg-yellow-50 flex items-center justify-between">
-      <div>
-        <p className="text-sm text-yellow-900 font-medium">
-          Please verify your email to unlock all features.
-        </p>
-        <p className="text-xs text-yellow-800">
-          Check your inbox or resend the verification email.
-        </p>
+    <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-gold/30 bg-gold/[0.06] p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-start gap-3">
+        <MailCheck className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
+        <div>
+          <p className="text-sm font-medium text-ink">Verify your email to start building your record.</p>
+          <p className="mt-0.5 text-xs text-subtle">Commitments, check-ins and cohort features unlock once you confirm your address.</p>
+        </div>
       </div>
-      <button
-        onClick={resend}
-        disabled={loading}
-        className="px-3 py-2 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50"
-      >
-        {loading ? 'Sending…' : 'Resend'}
-      </button>
+      <div className="flex gap-2">
+        <button type="button" onClick={() => refreshUser()} className="btn btn-ghost btn-sm">I've verified</button>
+        <button type="button" onClick={resend} disabled={loading} className="btn btn-secondary btn-sm">
+          {loading ? "Sending…" : "Resend email"}
+        </button>
+      </div>
     </div>
   );
 };
 
 export default VerificationBanner;
-

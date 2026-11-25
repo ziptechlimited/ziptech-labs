@@ -5,8 +5,25 @@ import Goal from '../models/Goal';
 import CheckIn from '../models/CheckIn';
 import User from '../models/User';
 import Cohort from '../models/Cohort';
+import { getWeekNumber } from '../controllers/goalController';
+import { PUBLIC_PROFILE_FIELDS, loadExecutionRecords, serializeProfile, summarize } from '../services/executionRecord';
 
 const router = express.Router();
+
+const buildLeaderboard = async (userIds: any[]) => {
+    const users = await User.find({ _id: { $in: userIds } }).select(`${PUBLIC_PROFILE_FIELDS} email`);
+    const records = await loadExecutionRecords(users);
+    return users
+        .map((u) => {
+            const record = records.get(u._id.toString())!;
+            return {
+                profile: { ...serializeProfile(u), email: u.email },
+                summary: summarize(record),
+                committedThisWeek: record.weekly[record.weekly.length - 1]?.commitments > 0,
+            };
+        })
+        .sort((a, b) => b.summary.score - a.summary.score);
+};
 
 // @desc    Get cohort analytics
 // @route   GET /api/analytics/cohort/:id
@@ -35,11 +52,15 @@ router.get('/cohort/:id', protect, requireVerified, async (req, res) => {
 
         // Calculate metrics
         const totalGoals = goals.length;
-        const completedGoals = checkIns.filter((c: any) => c.status === 'done').length;
+        const completedGoals = goals.filter((g: any) => g.status === 'done').length;
         const completionRate = totalGoals > 0 ? ((completedGoals / totalGoals) * 100).toFixed(1) : 0;
 
-        // Submission rate (users who submitted goals this week)
-        const usersWithGoals = new Set(goals.map((g: any) => g.user.toString()));
+        // Submission rate (members who committed this week)
+        const currentWeek = getWeekNumber(cohort.startDate);
+        const usersWithGoals = new Set(
+            goals.filter((g: any) => String(g.cohort) === String(cohort._id) && g.weekNumber === currentWeek)
+                .map((g: any) => g.user.toString())
+        );
         const submissionRate = cohort.members.length > 0 
             ? ((usersWithGoals.size / cohort.members.length) * 100).toFixed(1) 
             : 0;
@@ -61,7 +82,9 @@ router.get('/cohort/:id', protect, requireVerified, async (req, res) => {
                 submissionRate: parseFloat(submissionRate as string),
                 engagementScore: parseFloat(checkInsPerUser as string)
             },
-            members: cohort.members
+            members: cohort.members,
+            currentWeek,
+            leaderboard: await buildLeaderboard(memberIds)
         });
     } catch (error) {
         console.error(error);
@@ -90,7 +113,7 @@ router.get('/admin', protect, requireVerified, async (req, res) => {
         const totalCohorts = cohorts.length;
         const totalUsers = allUsers.length;
         const totalGoals = allGoals.length;
-        const completedGoals = allCheckIns.filter((c: any) => c.status === 'done').length;
+        const completedGoals = allGoals.filter((g: any) => g.status === 'done').length;
         const avgCompletion = totalGoals > 0 ? ((completedGoals / totalGoals) * 100).toFixed(1) : 0;
 
         // Active users (users with goals in last 7 days)
@@ -106,6 +129,7 @@ router.get('/admin', protect, requireVerified, async (req, res) => {
             totalGoals,
             completedGoals,
             avgCompletionRate: parseFloat(avgCompletion as string),
+            topFounders: (await buildLeaderboard(allUsers.filter((u: any) => u.role === 'founder').map((u: any) => u._id))).slice(0, 10),
             cohorts: cohorts.map((c: any) => ({
                 id: c._id,
                 name: c.name,

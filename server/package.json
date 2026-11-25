@@ -8,6 +8,7 @@
     "dev": "nodemon",
     "build": "tsc",
     "create-admin": "ts-node scripts/createAdmin.ts",
+    "seed:demo": "ts-node --files scripts/seedDemo.ts",
     "test": "jest --runInBand"
   },
   "keywords": [],

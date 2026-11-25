@@ -46,12 +46,20 @@ export const registerUser = async (
       return;
     }
 
+    // Only founder and investor accounts can be self-registered. Facilitators and
+    // admins are provisioned via scripts/createAdmin.ts or by an admin.
+    const selfServeRoles = ["founder", "investor"];
+    if (role && !selfServeRoles.includes(role)) {
+      res.status(403).json({ message: "This role cannot be self-registered" });
+      return;
+    }
+
     // Create user
     const user = await User.create({
       name,
       email,
       password,
-      role, // Optional, User model handles default.
+      role: role || "founder",
     });
 
     if (user) {
@@ -66,6 +74,8 @@ export const registerUser = async (
         name: user.name,
         email: user.email,
         role: user.role,
+        slug: user.slug,
+        isVerified: user.isVerified,
         token: generateToken(user._id.toString()),
       });
     } else {
@@ -93,7 +103,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         name: user.name,
         email: user.email,
         role: user.role,
-      isVerified: user.isVerified,
+        slug: user.slug,
+        isVerified: user.isVerified,
+        cohort: user.cohort,
         token: generateToken(user._id.toString()),
       });
     } else {
@@ -115,13 +127,32 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const u = req.user;
     res.status(200).json({
-      id: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      role: req.user.role,
-    isVerified: req.user.isVerified,
-    cohort: req.user.cohort,
+      _id: u._id,
+      id: u._id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      slug: u.slug,
+      isVerified: u.isVerified,
+      cohort: u.cohort,
+      avatarUrl: u.avatarUrl,
+      headline: u.headline,
+      bio: u.bio,
+      company: u.company,
+      companyOneLiner: u.companyOneLiner,
+      website: u.website,
+      location: u.location,
+      sector: u.sector,
+      stage: u.stage,
+      fundraising: u.fundraising,
+      raiseAmount: u.raiseAmount,
+      linkedin: u.linkedin,
+      twitter: u.twitter,
+      isProfilePublic: u.isProfilePublic !== false,
+      watchlist: u.watchlist ?? [],
+      createdAt: u.createdAt,
     });
   } catch (error) {
     console.error(error);
@@ -178,6 +209,11 @@ export const confirmVerification = async (
       return;
     }
     const result = await verifyEmailToken(token);
+    // Browsers following the email link land back in the app.
+    if (req.accepts(["json", "html"]) === "html") {
+      res.redirect(`${config.CLIENT_URL}/login?verified=${result}`);
+      return;
+    }
     if (result === "ok") {
       res.status(200).json({ message: "Email verified successfully" });
     } else if (result === "expired") {

@@ -15,6 +15,7 @@ interface Config {
   SMTP_PASS: string;
   EMAIL_FROM: string;
   APP_BASE_URL: string;
+  CLIENT_URL: string;
 }
 
 const getEnv = (key: string, defaultValue?: string): string => {
@@ -36,4 +37,5 @@ export const config: Config = {
   SMTP_PASS: getEnv("SMTP_PASS", "your-app-password"),
   EMAIL_FROM: getEnv("EMAIL_FROM", "no-reply@example.com"),
   APP_BASE_URL: getEnv("APP_BASE_URL", "http://localhost:5001"),
+  CLIENT_URL: getEnv("CLIENT_URL", "http://localhost:5173"),
 };

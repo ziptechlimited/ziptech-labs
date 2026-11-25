@@ -103,7 +103,7 @@ export const joinCohort = async (req: Request, res: Response): Promise<void> => 
 export const getCohort = async (req: Request, res: Response): Promise<void> => {
     try {
         const cohort = await Cohort.findById(req.params.id)
-            .populate('members', 'name email role')
+            .populate('members', 'name email role slug company avatarUrl')
             .populate('facilitator', 'name email');
 
         if (!cohort) {
@@ -148,7 +148,7 @@ export const getMyCohort = async (req: Request, res: Response): Promise<void> =>
             return;
         }
         const cohort = await (Cohort as any).findById(req.user.cohort)
-            .populate('members', 'name email role')
+            .populate('members', 'name email role slug company avatarUrl')
             .populate('facilitator', 'name email');
         if (!cohort) {
             res.status(404).json({ message: 'Cohort not found' });

@@ -51,7 +51,7 @@ export const sendMessage = async (req: Request, res: Response): Promise<void> =>
       content,
       expiresAt,
     });
-    await message.populate('user', 'name');
+    await message.populate('user', 'name slug');
     const io = req.app.get('io');
     if (io) {
       io.to(`cohort:${cohortId}`).emit('message', { message });
@@ -87,7 +87,7 @@ export const getMessages = async (req: Request, res: Response): Promise<void> =>
       return;
     }
     const messages = await Message.find({ cohort: cohortId, isMuted: false })
-      .populate('user', 'name')
+      .populate('user', 'name slug')
       .sort({ createdAt: 1 });
     const sessionActive = await CheckInSession.findOne({ cohort: cohortId, active: true });
     res.status(200).json({ messages, isCheckInDay: isCheckInDay(), sessionActive: !!sessionActive });

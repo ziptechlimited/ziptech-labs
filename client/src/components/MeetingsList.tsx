@@ -1,145 +1,112 @@
-import { useState, useEffect } from 'react';
-import { Calendar, Users, Clock } from 'lucide-react';
-import axios from 'axios';
-import { API_CONFIG } from '../config/api';
+import { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Clock, Video } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { API, cn, errorMessage } from "../lib/api";
+import { EmptyState } from "./ui/primitives";
 
-interface Meeting {
-    _id: string;
-    title: string;
-    agenda: string;
-    scheduledAt: string;
-    duration: number;
-    meetLink?: string;
-    rsvps: Array<{
-        user: { _id: string; name: string };
-        status: 'yes' | 'maybe' | 'no';
-    }>;
+export interface Meeting {
+  _id: string;
+  title: string;
+  agenda?: string;
+  scheduledAt: string;
+  duration: number;
+  meetLink?: string;
+  attendance?: string[];
+  rsvps: Array<{ user: { _id: string; name: string }; status: "yes" | "maybe" | "no" }>;
 }
 
-interface MeetingsListProps {
-    cohortId: string;
-}
+const RSVP = [
+  { value: "yes" as const, label: "Going" },
+  { value: "maybe" as const, label: "Maybe" },
+  { value: "no" as const, label: "Can't" },
+];
 
-const MeetingsList = ({ cohortId }: MeetingsListProps) => {
-    const [meetings, setMeetings] = useState<Meeting[]>([]);
-    const [loading, setLoading] = useState(true);
+export const MeetingDate = ({ iso }: { iso: string }) => {
+  const d = new Date(iso);
+  return (
+    <div className="flex w-14 shrink-0 flex-col items-center rounded-xl border border-white/[0.08] bg-white/[0.02] py-2">
+      <span className="eyebrow text-[9px]">{d.toLocaleDateString(undefined, { month: "short" })}</span>
+      <span className="display text-xl font-medium">{d.getDate()}</span>
+    </div>
+  );
+};
 
-    useEffect(() => {
-        fetchMeetings();
-    }, [cohortId]);
+const MeetingsList = ({ cohortId }: { cohortId: string }) => {
+  const { user } = useAuth();
+  const [meetings, setMeetings] = useState<Meeting[] | null>(null);
 
-    const fetchMeetings = async () => {
-        try {
-            const res = await axios.get(`${API_CONFIG.BASE_URL}/meetings?cohort=${cohortId}`);
-            setMeetings(res.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRSVP = async (meetingId: string, status: 'yes' | 'maybe' | 'no') => {
-        try {
-            await axios.post(`${API_CONFIG.BASE_URL}/meetings/${meetingId}/rsvp`, { status });
-            fetchMeetings();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    if (loading) {
-        return <div className="text-gray-500">Loading meetings...</div>;
+  const fetchMeetings = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/meetings?cohort=${cohortId}`);
+      setMeetings(res.data);
+    } catch (error) {
+      console.error(error);
+      setMeetings([]);
     }
+  }, [cohortId]);
 
-    if (meetings.length === 0) {
-        return <div className="text-gray-500 italic">No upcoming meetings</div>;
+  useEffect(() => {
+    fetchMeetings();
+  }, [fetchMeetings]);
+
+  const handleRSVP = async (meetingId: string, status: "yes" | "maybe" | "no") => {
+    try {
+      await axios.post(`${API}/meetings/${meetingId}/rsvp`, { status });
+      fetchMeetings();
+    } catch (error) {
+      toast.error(errorMessage(error, "Couldn't save RSVP"));
     }
+  };
 
-    return (
-        <div className="space-y-4">
-            {meetings.map((meeting) => (
-                <div key={meeting._id} className="bg-white border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                        <div>
-                            <h4 className="font-semibold text-gray-900">{meeting.title}</h4>
-                            <div className="flex items-center text-sm text-gray-600 mt-1">
-                                <Calendar className="w-4 h-4 mr-1" />
-                                {new Date(meeting.scheduledAt).toLocaleDateString('en-US', {
-                                    weekday: 'short',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
-                                <Clock className="w-4 h-4 ml-3 mr-1" />
-                                {meeting.duration} min
-                            </div>
-                        </div>
-                    </div>
+  if (meetings === null) return <p className="py-8 text-center text-sm text-faint">Loading meetings…</p>;
 
-                    {meeting.agenda && (
-                        <p className="text-sm text-gray-700 mb-3">{meeting.agenda}</p>
-                    )}
+  const now = Date.now();
+  const upcoming = meetings.filter((m) => new Date(m.scheduledAt).getTime() + m.duration * 60000 >= now);
+  if (upcoming.length === 0) return <EmptyState title="No upcoming meetings" body="Your facilitator will schedule cohort sessions here." />;
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-gray-600">
-                            <Users className="w-4 h-4 mr-1" />
-                            {meeting.rsvps.filter(r => r.status === 'yes').length} attending
-                        </div>
-                        <div className="flex space-x-2">
-                            <button
-                                onClick={() => handleRSVP(meeting._id, 'yes')}
-                                className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition"
-                            >
-                                Yes
-                            </button>
-                            <button
-                                onClick={() => handleRSVP(meeting._id, 'maybe')}
-                                className="px-3 py-1 text-xs bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200 transition"
-                            >
-                                Maybe
-                            </button>
-                            <button
-                                onClick={() => handleRSVP(meeting._id, 'no')}
-                                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition"
-                            >
-                                No
-                            </button>
-                        </div>
-                    </div>
-                    {meeting.rsvps.length > 0 && (
-                        <div className="mt-3 text-xs text-gray-600">
-                            Attendees:{" "}
-                            {meeting.rsvps
-                                .filter(r => r.status === 'yes')
-                                .map(r => (
-                                    <a
-                                        key={r.user._id}
-                                        href={`/profile/${r.user._id}`}
-                                        className="hover:underline text-primary mr-2"
-                                    >
-                                        {r.user.name}
-                                    </a>
-                                ))}
-                        </div>
-                    )}
-                    {meeting.meetLink && (
-                        <div className="mt-3 text-xs">
-                            <a
-                                href={meeting.meetLink}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-blue-600 hover:underline mr-2"
-                            >
-                                Join via Google Meet
-                            </a>
-                        </div>
-                    )}
+  return (
+    <ul className="space-y-3">
+      {upcoming.map((m) => {
+        const mine = m.rsvps.find((r) => r.user?._id === user?._id)?.status;
+        const going = m.rsvps.filter((r) => r.status === "yes");
+        return (
+          <li key={m._id} className="flex gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.015] p-4">
+            <MeetingDate iso={m.scheduledAt} />
+            <div className="min-w-0 flex-1">
+              <p className="text-ink">{m.title}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-faint">
+                <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" />{new Date(m.scheduledAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} · {m.duration} min</span>
+                <span>{going.length} going</span>
+              </p>
+              {m.agenda && <p className="mt-2 text-sm text-subtle">{m.agenda}</p>}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="flex rounded-xl border border-white/[0.08] p-0.5" role="group" aria-label="RSVP">
+                  {RSVP.map((r) => (
+                    <button
+                      key={r.value}
+                      type="button"
+                      onClick={() => handleRSVP(m._id, r.value)}
+                      aria-pressed={mine === r.value}
+                      className={cn("rounded-[10px] px-3 py-1 text-xs transition", mine === r.value ? "bg-lime text-bg" : "text-subtle hover:text-ink")}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
                 </div>
-            ))}
-        </div>
-    );
+                {m.meetLink && (
+                  <a href={m.meetLink} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm">
+                    <Video className="h-3.5 w-3.5" /> Join call
+                  </a>
+                )}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  );
 };
 
 export default MeetingsList;
